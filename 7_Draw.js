@@ -510,7 +510,7 @@ function updateJoystickBounds(theme = getCanvasTheme()) {
      joystick.x = isRightSide ?
           miniGameWidth - baseRadius - edgeGap :
           baseRadius + edgeGap;
-     joystick.y = miniGameHeight - baseRadius - edgeGap;
+     joystick.y = miniGameHeight - baseRadius - edgeGap - (joystickStyle.yOffset || 0);
 }
 
 export function syncUiBounds() {
