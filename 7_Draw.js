@@ -27,7 +27,6 @@ import {
      miniGameWidth,
      miniGameHeight,
      player,
-     keys,
      touchControls,
      sparkleScore,
      playerHealth,
@@ -1016,104 +1015,6 @@ export function drawPlayer() {
      }
 
      miniGameCtx.fillText(player.char, player.x, player.y + playerYOffset);
-     miniGameCtx.restore();
-}
-
-function getPlayerMovementDirection() {
-     if (
-          (
-               movementLevel === movementOptionIndexes.joystickLeft ||
-               movementLevel === movementOptionIndexes.joystickRight
-          ) &&
-          touchControls.joystick.isActive
-     ) {
-          return {
-               dx: touchControls.joystick.dx,
-               dy: touchControls.joystick.dy
-          };
-     }
-
-     if (movementLevel === movementOptionIndexes.touchClick && touchControls.touchMoveTarget.isActive) {
-          return {
-               dx: touchControls.touchMoveTarget.x - player.x,
-               dy: touchControls.touchMoveTarget.y - player.y
-          };
-     }
-
-     if (movementLevel === movementOptionIndexes.keyboard) {
-          let dx = 0;
-          let dy = 0;
-
-          if (keys.a || keys.A || keys.ArrowLeft || keys.arrowleft) {
-               dx -= 1;
-          }
-
-          if (keys.d || keys.D || keys.ArrowRight || keys.arrowright) {
-               dx += 1;
-          }
-
-          if (keys.w || keys.W || keys.ArrowUp || keys.arrowup) {
-               dy -= 1;
-          }
-
-          if (keys.s || keys.S || keys.ArrowDown || keys.arrowdown) {
-               dy += 1;
-          }
-
-          return { dx, dy };
-     }
-
-     return { dx: 0, dy: 0 };
-}
-
-export function drawPlayerMovementArrow(theme) {
-     if (
-          !miniGameCtx ||
-          gamePaused ||
-          gameMenuOpen ||
-          gameOver ||
-          gameWon ||
-          (
-               movementLevel !== movementOptionIndexes.joystickLeft &&
-               movementLevel !== movementOptionIndexes.joystickRight
-          )
-     ) {
-          return;
-     }
-
-     const arrowStyle = getTextStyle(theme, "movementArrow");
-     const direction = getPlayerMovementDirection();
-     const length = Math.hypot(direction.dx, direction.dy);
-
-     if (length <= (arrowStyle.deadZone || 0.05)) {
-          return;
-     }
-
-     const normalizedX = direction.dx / length;
-     const normalizedY = direction.dy / length;
-     const arrowDistance = player.radius + arrowStyle.distance;
-     const arrowX = player.x + (normalizedX * arrowDistance);
-     const arrowY = player.y + (normalizedY * arrowDistance);
-     const arrowRotation = Math.atan2(normalizedY, normalizedX) + (Math.PI / 2);
-
-     miniGameCtx.save();
-     miniGameCtx.translate(arrowX, arrowY);
-     miniGameCtx.rotate(arrowRotation);
-
-     drawStyledCanvasText(
-          miniGameCtx,
-          "\u21E7",
-          0,
-          0,
-          "movementArrow",
-          theme,
-          {
-               color: arrowStyle.color,
-               align: "center",
-               baseline: "middle"
-          }
-     );
-
      miniGameCtx.restore();
 }
 
@@ -2275,7 +2176,6 @@ export function drawGame() {
           drawCollisionBursts();
           drawPlayerTrail();
           drawPlayer();
-          drawPlayerMovementArrow(theme);
 
           drawFogOverlay();
 

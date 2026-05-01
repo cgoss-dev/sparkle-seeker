@@ -247,7 +247,7 @@ export function getCanvasTheme() {
 
           pauseButton: {
                font: "body",
-               fontSize: uiFontSm,
+               fontSize: uiFontSm * 1.25,
                letterSpacing: 0,
                color: bodyColor,
                rainbow: false,
@@ -262,17 +262,6 @@ export function getCanvasTheme() {
                fill: getCssColor("--translu-max", "rgba(0, 0, 0, 0.2)"),
                stroke: outlineFallback,
                knobFill: bodyColor,
-               glow: true
-          },
-
-          movementArrow: {
-               font: "symbol",
-               fontSize: uiFontMd,
-               letterSpacing: 0,
-               distance: uiFontSm,
-               deadZone: 0.05,
-               color: bodyColor,
-               rainbow: false,
                glow: true
           },
 
