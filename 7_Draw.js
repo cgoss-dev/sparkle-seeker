@@ -486,7 +486,11 @@ function updateMenuUiBounds(theme = getCanvasTheme()) {
 function updatePauseButtonBounds(theme = getCanvasTheme()) {
      const button = touchControls.pauseButton;
      const canvasSpacing = getTextStyle(theme, "canvasSpacing");
+     const buttonStyle = getTextStyle(theme, "pauseButton");
+     const buttonSize = buttonStyle.fontSize + canvasSpacing.uiPadding;
 
+     button.width = buttonSize;
+     button.height = buttonSize;
      button.x = (miniGameWidth - button.width) / 2;
      button.y = canvasSpacing.uiPadding;
 }
@@ -495,13 +499,19 @@ function updateJoystickBounds(theme = getCanvasTheme()) {
      const joystick = touchControls.joystick;
      const joystickStyle = getTextStyle(theme, "joystick");
      const isRightSide = movementLevel === movementOptionIndexes.joystickRight;
+     const edgeGap = joystickStyle.edgeGap || 0;
+     const canvasMin = Math.min(miniGameWidth, miniGameHeight);
+     const baseRadius = Math.min(joystickStyle.baseRadius, canvasMin * 0.12);
+     const knobRadius = Math.min(joystickStyle.knobRadius, baseRadius * 0.55);
 
-     joystick.baseRadius = joystickStyle.baseRadius;
-     joystick.knobRadius = joystickStyle.knobRadius;
-     joystick.maxDistance = Math.max(1, joystickStyle.baseRadius - joystickStyle.knobRadius);
+     joystick.baseRadius = baseRadius;
+     joystick.knobRadius = knobRadius;
+     joystick.maxDistance = Math.max(1, baseRadius - knobRadius);
      joystick.deadZone = joystickStyle.deadZone;
-     joystick.x = miniGameWidth * (isRightSide ? 5 / 6 : 1 / 6);
-     joystick.y = miniGameHeight * (2 / 3);
+     joystick.x = isRightSide ?
+          miniGameWidth - baseRadius - edgeGap :
+          baseRadius + edgeGap;
+     joystick.y = miniGameHeight - baseRadius - edgeGap;
 }
 
 export function syncUiBounds() {
@@ -1057,7 +1067,17 @@ function getPlayerMovementDirection() {
 }
 
 export function drawPlayerMovementArrow(theme) {
-     if (!miniGameCtx || gamePaused || gameMenuOpen || gameOver || gameWon) {
+     if (
+          !miniGameCtx ||
+          gamePaused ||
+          gameMenuOpen ||
+          gameOver ||
+          gameWon ||
+          (
+               movementLevel !== movementOptionIndexes.joystickLeft &&
+               movementLevel !== movementOptionIndexes.joystickRight
+          )
+     ) {
           return;
      }
 

@@ -247,7 +247,7 @@ export function getCanvasTheme() {
 
           pauseButton: {
                font: "body",
-               fontSize: 25,
+               fontSize: uiFontSm,
                letterSpacing: 0,
                color: bodyColor,
                rainbow: false,
@@ -255,12 +255,11 @@ export function getCanvasTheme() {
           },
 
           joystick: {
-               baseRadius: uiFontLg * 1.75,
-               knobRadius: uiFontMd,
-               sideOffset: uiFontLg * 1.35,
-               bottomOffset: uiFontLg * 1.35,
+               baseRadius: uiFontLg * 1.25,
+               knobRadius: uiFontMd * 0.8,
+               edgeGap: uiFontSm * 0.35,
                deadZone: 0.12,
-               fill: controlFillFallback,
+               fill: getCssColor("--translu-max", "rgba(0, 0, 0, 0.2)"),
                stroke: outlineFallback,
                knobFill: bodyColor,
                glow: true

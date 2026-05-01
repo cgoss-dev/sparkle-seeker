@@ -100,6 +100,10 @@ body.sparkle-embed {
      background: var(--game-color-bg);
 }
 
+html:has(body.sparkle-embed) {
+     min-width: 0;
+}
+
 body.sparkle-embed .main-squeeze {
      width: 100vw;
      height: 100dvh;
