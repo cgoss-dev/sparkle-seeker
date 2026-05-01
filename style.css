@@ -1,0 +1,222 @@
+/* NOTE: SPARKLE SEEKER STANDALONE ROOT CSS */
+
+:root {
+     /* COLORS */
+          --color-black: #111;
+          --color-gray1: #333;
+          --color-gray2: #666;
+          --color-gray3: #999;
+          --color-white: #fff;
+          --color-rainbow: #f0f;
+          --translu-max: rgba(0, 0, 0, 0.2);
+          --translu-med: rgba(0, 0, 0, 0.4);
+          --translu-low: rgba(0, 0, 0, 0.6);
+          --translu-min: rgba(0, 0, 0, 0.8);
+          --opacity-min: rgba(255, 255, 255, 0.2);
+          --opacity-low: rgba(255, 255, 255, 0.4);
+
+     /* 12-BIT PALETTE */
+          --12bit-01: #f00;
+          --12bit-02: #f80;
+          --12bit-03: #ff0;
+          --12bit-04: #bf0;
+          --12bit-05: #0f0;
+          --12bit-06: #0fb;
+          --12bit-07: #0ff;
+          --12bit-08: #0bf;
+          --12bit-09: #00f;
+          --12bit-10: #80f;
+          --12bit-11: #f0f;
+          --12bit-12: #f08;
+
+     /* TYPOGRAPHY */
+          --font-body: "Noto Sans Mono", monospace;
+          --font-display: "Bungee Shade", monospace;
+          --font-size-lg: clamp(3rem, 6vw, 6rem);
+          --font-size-md: clamp(2rem, 4vw, 4rem);
+          --font-size-sm: clamp(1rem, 2vw, 1.5rem);
+          --marquee-font-size: var(--font-size-lg);
+          --marquee-font-color: var(--color-gray3);
+          --marquee-letter-spacing: 0.25px;
+
+     /* BORDERS */
+          --border-lg: 3px;
+          --border-md: 2px;
+          --border-sm: 1px;
+          --border-radius: 10px;
+
+     /* LAYOUT */
+          --page-width-wide: 75rem;
+          --page-padding: 2rem;
+          --page-section-gap: var(--page-padding);
+          --home-panel-width: var(--game-board-width);
+          --home-panel-height: var(--game-board-height);
+          --nav-height: max(3rem, var(--font-size-sm));
+          --nav-btn-gap: 0.5rem;
+          --nav-btn-pad: 1rem;
+
+     /* COMPONENTS */
+          --button-bg-unselected: var(--color-black);
+          --button-bg-selected: var(--color-gray1);
+          --panel-border-width: var(--border-lg);
+          --panel-border-color: var(--color-gray3);
+          --panel-border: var(--panel-border-width) solid var(--panel-border-color);
+          --panel-radius: var(--border-radius);
+          --panel-glow-color: var(--color-white);
+
+     /* GLOW */
+          --glow-color: var(--color-white);
+          --glow-depth: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.5);
+          --glow-core: 0 0 clamp(0.01rem, 0.04vw, 0.03rem);
+          --glow-soft: 0 0 clamp(0.04rem, 0.15vw, 0.12rem);
+          --glow-wide: 0 0 clamp(0.08rem, 0.3vw, 0.25rem);
+          --glow-text:
+               var(--glow-core) currentColor,
+               var(--glow-soft) currentColor,
+               var(--glow-wide) currentColor;
+          --glow-panel:
+               var(--glow-depth),
+               var(--glow-wide) var(--panel-glow-color),
+               0 0 1rem var(--panel-glow-color);
+          --glow-particle-bg-blur: 12;
+          --glow-particle-game-blur: 16;
+
+     /* BACKGROUND PARTICLES */
+          --sparkle-count-max: 180;
+          --sparkle-size-min: 16;
+          --sparkle-size-max: 26;
+          --sparkle-speed-min: 0.2;
+          --sparkle-speed-max: 0.7;
+          --sparkle-density: 0.00015;
+          --sparkle-wobble-speed-min: 0.005;
+          --sparkle-wobble-speed-max: 0.02;
+          --sparkle-wobble-amount-min: 5;
+          --sparkle-wobble-amount-max: 15;
+          --sparkle-opacity-min: 0.2;
+          --sparkle-opacity-max: 1;
+          --sparkle-respawn-offset-top: -20;
+          --sparkle-respawn-offset-bottom: 24;
+}
+
+*,
+*::before,
+*::after {
+     box-sizing: border-box;
+}
+
+html,
+body {
+     min-width: 320px;
+     min-height: 100%;
+     margin: 0;
+}
+
+body {
+     min-height: 100dvh;
+     overflow-x: hidden;
+     color: var(--color-white);
+     font-family: var(--font-body);
+     background: var(--color-black);
+}
+
+.site-bg-canvas {
+     position: fixed;
+     inset: 0;
+     z-index: -1;
+     width: 100%;
+     height: 100%;
+     pointer-events: none;
+}
+
+.body-ody {
+     min-height: 100dvh;
+     padding: var(--page-padding);
+}
+
+.site-header {
+     position: relative;
+     top: var(--header-top);
+     max-width: 100%;
+     margin: 0 auto;
+     z-index: 10;
+}
+
+.header-top {
+     width: 100%;
+     min-height: var(--nav-height);
+     margin: 0 auto;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     gap: 1rem;
+     min-width: 0;
+}
+
+.site-title {
+     margin: 0;
+     min-width: 0;
+     font-family: var(--font-display);
+     font-size: var(--font-size-lg);
+     line-height: 1;
+}
+
+.site-title-link,
+.site-title-link:is(:visited, :hover, :active, :focus-visible) {
+     color: var(--marquee-font-color);
+     letter-spacing: var(--marquee-letter-spacing);
+     text-decoration: none;
+}
+
+.site-title-link:is(:hover, :active, :focus-visible) {
+     color: var(--color-white);
+     text-shadow: var(--glow-text);
+}
+
+.nav-menu {
+     display: flex;
+     justify-content: flex-end;
+     gap: var(--nav-btn-gap);
+}
+
+.nav-link {
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     min-height: var(--nav-height);
+     padding: var(--nav-btn-pad);
+     color: var(--color-gray3);
+     font-family: var(--font-body);
+     font-size: var(--font-size-sm);
+     line-height: 1;
+     text-decoration: none;
+     white-space: nowrap;
+     border: var(--border-sm) solid var(--color-gray3);
+     border-radius: var(--border-radius);
+     background: var(--button-bg-unselected);
+}
+
+.nav-link:is(:hover, :active, :focus-visible) {
+     color: var(--color-white);
+     border-width: var(--border-md);
+     background: var(--button-bg-selected);
+     box-shadow: var(--glow-text);
+}
+
+.main-squeeze {
+     min-height: calc(100dvh - (var(--page-padding) * 2));
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     padding: 0;
+}
+
+@media (max-width: 42rem) {
+     .header-top {
+          align-items: flex-start;
+          flex-direction: column;
+     }
+
+     .site-title {
+          font-size: var(--font-size-md);
+     }
+}

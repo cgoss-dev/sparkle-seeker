@@ -1,0 +1,46 @@
+<!-- NOTE: SPARKLE SEEKER STANDALONE -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>✨Sparkle Seeker✨</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400;600&family=Bungee+Shade&display=swap"
+     >
+
+     <link rel="stylesheet" href="./style.css">
+     <link rel="stylesheet" href="./1_SparkleSeeker.css">
+</head>
+<body>
+     <canvas id="siteBgCanvas" class="site-bg-canvas" aria-hidden="true"></canvas>
+     <div class="body-ody">
+
+          <header class="site-header">
+               <div class="header-top">
+                    <h1 class="site-title">
+                         <a class="site-title-link" href="./index.html">Sparkle Seeker</a>
+                    </h1>
+                    <nav class="nav-menu" aria-label="Project navigation">
+                         <a class="nav-link" href="../001_PortfolioProject/games/projects.html">Projects</a>
+                    </nav>
+               </div>
+          </header>
+          
+          <main class="main-squeeze">
+               <section class="hero-stack" aria-label="Intro section">
+                    <div class="game-container">
+                         <canvas id="miniGameCanvas" width="500" height="500"></canvas>
+                    </div>
+               </section>
+          </main>
+
+     </div>
+     <script type="module" src="./1_SparkleSeeker.js"></script>
+     <script type="module" src="./2_GameEngine.js"></script>
+</body>
+</html>

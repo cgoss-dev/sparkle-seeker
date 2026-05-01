@@ -1,0 +1,93 @@
+/* NOTE: SPARKLE SEEKER */
+
+:root {
+     /* GAME LAYOUT */
+          --game-board-width: min(92vw, 75rem);
+          --game-board-height-min: calc(var(--game-board-width) * 0.75);
+          --game-board-height-preferred: 75dvh;
+          --game-board-height-max: calc(var(--game-board-width) * 1.25);
+          --game-board-height: clamp(
+               var(--game-board-height-min),
+               var(--game-board-height-preferred),
+               var(--game-board-height-max)
+          );
+          --game-board-top: calc(var(--page-padding) + ((100dvh - (var(--page-padding) * 2) - var(--game-board-height)) / 2));
+          --header-top: calc(var(--game-board-top) / 2);
+
+     /* GAME COLORS */
+          --game-color-bg: var(--color-black);
+          --game-color-text: var(--color-white);
+          --game-color-body: var(--color-gray3);
+          --game-color-title: var(--game-color-text);
+          --game-control-fill: var(--button-bg-unselected);
+          --game-outline-strong: var(--color-gray3);
+          --game-touch-fill: var(--button-bg-unselected);
+          --game-touch-border-color: var(--color-gray3);
+          --game-touch-glow: var(--glow-color);
+          --game-touch-text-color: var(--game-color-text);
+
+     /* GAME UI */
+          --ui-border-width: var(--border-sm);
+          --ui-panel-border-width: var(--border-lg);
+          --ui-border-width-focus: var(--border-md);
+          --ui-touch-border-width: var(--border-lg);
+          --ui-touch-border-color: var(--color-gray3);
+          --ui-touch-fill: var(--translu-max);
+          --ui-touch-glow: var(--color-white);
+          --ui-touch-text-color: var(--color-white);
+
+     /* GAME EFFECTS */
+          --glow-particle-game-blur: 16;
+}
+
+body {
+     background: var(--game-color-bg);
+}
+
+.site-header {
+     width: var(--game-board-width);
+}
+
+.hero-stack {
+     width: 100%;
+     max-width: 100%;
+     min-width: 0;
+     margin: 0 auto;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     gap: 0;
+     padding: 0;
+}
+
+.game-container {
+     width: var(--game-board-width);
+     height: var(--game-board-height);
+     max-width: 100%;
+     margin: 0 auto;
+     border: var(--panel-border);
+     border-radius: var(--panel-radius);
+     box-shadow: var(--glow-panel);
+     background: var(--game-color-bg);
+     overflow: hidden;
+     display: flex;
+     align-items: stretch;
+     justify-content: stretch;
+     touch-action: none;
+}
+
+#miniGameCanvas {
+     width: 100%;
+     height: 100%;
+     display: block;
+     border-radius: inherit;
+     touch-action: none;
+}
+
+body.game-running,
+body.game-paused,
+body.game-overlay-open {
+     overflow: hidden;
+     overscroll-behavior: none;
+}

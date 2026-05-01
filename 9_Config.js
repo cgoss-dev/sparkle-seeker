@@ -1,0 +1,405 @@
+// NOTE: 9_Config
+// Canvas theme assembly, CSS readers, and canvas-only config knobs for Sparkle Seeker.
+//
+// Owned here:
+// - CSS variable readers
+// - canvas theme creation
+// - small canvas presentation config values
+// - frequently adjusted Sparkle Seeker page/game presentation values
+//
+// NOT owned here:
+// - runtime mutable state
+// - gameplay logic
+// - rendering implementation
+//
+// Newbie note:
+// - This file should answer "what theme/config values does canvas UI use?"
+// - If code draws, updates entities, or mutates game state, it belongs elsewhere.
+
+export const sparkleSeekerRainbowCycleMs = 240;
+
+export const sparkleSeekerRainbowPalette = [
+     "#f00",
+     "#f80",
+     "#ff0",
+     "#bf0",
+     "#0f0",
+     "#0fb",
+     "#0ff",
+     "#0bf",
+     "#00f",
+     "#80f",
+     "#f0f",
+     "#f08"
+];
+
+
+
+
+
+export const sparkleSeekerEffectIcons = {
+
+     // NOTE: HELPFUL EFFECTS
+
+     iconLuck: {
+          category: "helpful",
+          name: "luck",
+          label: "LUCK",
+          particle: "\u2618\uFE0E",
+          effect: "doubleSparkleScore",
+          lastsUntilUsed: false,
+          durationSeconds: 8,
+          scale: 1.5,
+          xOffset: 0,
+          yOffset: -6
+     },
+
+     iconMagnet: {
+          category: "helpful",
+          name: "magnet",
+          label: "MAGNET",
+          particle: "\u2316\uFE0E",
+          effect: "expandSparklePickupRange",
+          lastsUntilUsed: false,
+          durationSeconds: 5,
+          scale: 1.5,
+          xOffset: -3,
+          yOffset: -7
+     },
+
+     iconSlowmo: {
+          category: "helpful",
+          name: "slowmo",
+          label: "SLOWMO",
+          particle: "\u29D6\uFE0E",
+          effect: "halveObjectFallSpeed",
+          lastsUntilUsed: false,
+          durationSeconds: 8,
+          scale: 1.75,
+          xOffset: -1,
+          yOffset: -5
+     },
+
+     // NOTE: HARMFUL EFFECTS
+
+     iconFreeze: {
+          category: "harmful",
+          name: "freeze",
+          label: "FREEZE",
+          particle: "\u2744\uFE0E",
+          effect: "freezePlayerMovement",
+          lastsUntilUsed: false,
+          durationSeconds: 5,
+          scale: 1.75,
+          xOffset: 1,
+          yOffset: -4
+     },
+
+     iconDaze: {
+          category: "harmful",
+          name: "daze",
+          label: "DAZE",
+          particle: "\u2300\uFE0E",
+          effect: "reversePlayerMovement",
+          lastsUntilUsed: false,
+          durationSeconds: 5,
+          scale: 1.5,
+          xOffset: 0,
+          yOffset: -6
+     },
+
+     iconFog: {
+          category: "harmful",
+          name: "fog",
+          label: "FOG",
+          particle: "\u224B\uFE0E",
+          effect: "limitVisionAroundPlayer",
+          lastsUntilUsed: false,
+          durationSeconds: 8,
+          scale: 1.75,
+          xOffset: 0,
+          yOffset: -4
+     }
+};
+
+function getSiteTheme() {
+     return window.SiteTheme;
+}
+
+
+
+
+
+// ====================================================================================================
+// NOTE: ⭐️ GET CANVAS THEME
+// ====================================================================================================
+
+export function getCanvasTheme() {
+     const fontColor = getCssColor("--game-color-text", getCssColor("--color-white", "#ffffff"));
+     const bodyColor = getCssColor("--game-color-body", getCssColor("--color-gray3", "#808080"));
+     const titleColor = getCssColor("--game-color-title", getCssColor("--color-gray3", "#808080"));
+     const uiFontLg = getCssPixelSize("--font-size-lg", 20);
+     const uiFontMd = getCssPixelSize("--font-size-md", 15);
+     const uiFontSm = getCssPixelSize("--font-size-sm", 10);
+
+     const menuOverlayFill = "rgba(0, 0, 0, 0.75)";
+     const controlFillFallback = getCssColor("--game-control-fill", getCssColor("--translu-max", "rgba(0, 0, 0, 0.25)"));
+     const outlineFallback = getCssColor("--game-outline-strong", getCssColor("--color-gray3", "#999999"));
+
+     const text = {
+          canvasSpacing: {
+               uiPadding: uiFontSm,
+               uiRowGap: uiFontSm,
+               circleTitleGap: uiFontSm * 1.25,
+               menuPadding: uiFontMd,
+               betweenButtons: uiFontSm,
+               bodyLineHeight: uiFontMd,
+               friendsEnemiesIconGutter: uiFontLg
+          },
+
+          marquee: {
+               font: "marquee",
+               fontSize: uiFontLg,
+               minSize: uiFontMd,
+               shrinkStep: 2,
+               sidePadding: uiFontSm,
+               letterSpacing: 0.25,
+               stackGap: 10,
+               color: titleColor,
+               rainbow: true,
+               glow: false
+          },
+
+          title: {
+               font: "marquee",
+               fontSize: uiFontMd,
+               letterSpacing: 0.25,
+               color: titleColor,
+               rainbow: true,
+               glow: false
+          },
+
+          levelStatus: {
+               font: "marquee",
+               fontSize: uiFontSm * 1.75,
+               letterSpacing: 0.25,
+               color: "#fff",
+               rainbow: false,
+               glow: false
+          },
+
+          circleMeters: {
+               font: "circleMeter",
+               fontSize: uiFontMd,
+               emptyChar: "\u25CB\uFE0E",
+               halfChar: "\u25D2\uFE0E",
+               fullChar: "\u25CF\uFE0E",
+               advanceScale: 0.75,
+               letterSpacing: 0.25,
+               color: bodyColor,
+               rainbow: false,
+               glow: true
+          },
+
+          scoreReady: {
+               font: "body",
+               fontSize: uiFontSm * 1.25,
+               letterSpacing: 0,
+               color: bodyColor,
+               rainbow: false,
+               glow: true
+          },
+
+          scoreIcon: {
+               font: "symbol",
+               fontSize: uiFontSm * 1.5,
+               particle: "\u2726\uFE0E",
+               gap: uiFontSm * 0.5,
+               xOffset: 0,
+               yOffset: -1,
+               color: bodyColor,
+               rainbow: false,
+               glow: true
+          },
+
+          statusIcon: {
+               font: "body",
+               fontSize: uiFontSm * 1.5,
+               gap: uiFontSm * 0.5,
+               xOffset: 0,
+               yOffset: -1,
+               color: bodyColor,
+               rainbow: false,
+               glow: true
+          },
+
+          buttonsOptions: {
+               font: "body",
+               fontSize: uiFontSm,
+               letterSpacing: 0,
+               buttonExteriorPadding: uiFontSm,
+               buttonHeight: uiFontMd,
+               backButtonBottomOffset: 0,
+               color: bodyColor,
+               rainbow: false,
+               glow: true
+          },
+
+          pauseButton: {
+               font: "body",
+               fontSize: 25,
+               letterSpacing: 0,
+               color: bodyColor,
+               rainbow: false,
+               glow: true
+          },
+
+          friendsEnemiesIcons: sparkleSeekerEffectIcons
+     };
+
+     const base = {
+          uiFontLg,
+          uiFontMd,
+          uiFontSm,
+          controlRadius: getCssNumber("--border-radius", 30),
+          borderWidth: getCssNumber("--border-sm", 1),
+          borderWidthFocus: getCssNumber("--border-md", 2),
+          panelBorderWidth: getCssNumber("--border-lg", 3),
+          touchBorderWidth: getCssNumber("--border-lg", 3)
+     };
+
+     return {
+          fonts: {
+               marquee: getCssString("--font-display", "\"Bungee Shade\", cursive"),
+               body: getCssString("--font-body", "\"Noto Sans Mono\", monospace"),
+               circleMeter: "\"Apple Symbols\", \"Segoe UI Symbol\", \"Noto Sans Symbols\", sans-serif",
+               symbol: "\"Segoe UI Symbol\", \"Apple Color Emoji\", \"Noto Color Emoji\", sans-serif"
+          },
+
+          colors: {
+               fontColor,
+               bodyText: bodyColor,
+               titleText: titleColor,
+               titleRainbow: sparkleSeekerRainbowPalette,
+               controlText: bodyColor,
+               controlGlow: fontColor,
+               overlayGlow: fontColor,
+               statusText: bodyColor,
+               statusTextGlow: fontColor,
+               meterFull: bodyColor,
+               meterGlow: bodyColor,
+
+               controlFill: controlFillFallback,
+               outlineStrong: outlineFallback,
+
+               touchFill: getCssColor("--game-touch-fill", getCssColor("--ui-touch-fill", controlFillFallback)),
+               touchStroke: getCssColor("--game-touch-border-color", getCssColor("--ui-touch-border-color", outlineFallback)),
+               touchGlow: getCssColor("--game-touch-glow", getCssColor("--ui-touch-glow", fontColor)),
+               touchText: getCssColor("--game-touch-text-color", getCssColor("--ui-touch-text-color", bodyColor)),
+
+               menuScreenFill: menuOverlayFill,
+               menuPanelFill: menuOverlayFill
+          },
+
+          sizes: {
+               ...base
+          },
+
+          text,
+
+          screens: {
+               welcome: {
+                    textStyle: "marquee"
+               },
+
+               paused: {
+                    textStyle: "marquee",
+                    overlayFill: menuOverlayFill
+               },
+
+               result: {
+                    textStyle: "marquee",
+                    overlayFill: menuOverlayFill
+               }
+          },
+
+          glow: {
+               uiSoftGlow: getCssNumber("--glow-particle-bg-blur", 10),
+               uiMediumGlow: getCssNumber("--glow-particle-game-blur", 16),
+               uiStrongGlow: getCssNumber("--glow-particle-game-blur", 16) * 1.35,
+               uiTitleGlow1: getCssNumber("--glow-particle-bg-blur", 10) * 0.75,
+               uiTitleGlow2: getCssNumber("--glow-particle-game-blur", 16),
+               uiTitleGlow3: getCssNumber("--glow-particle-game-blur", 16) * 1.6
+          },
+
+          animation: {
+               titleRainbowCycleMs: sparkleSeekerRainbowCycleMs
+          }
+     };
+}
+
+
+
+
+
+// ==================================================
+// CSS / THEME HELPERS
+// ==================================================
+
+export function getCssColor(variableName, fallback = "#ffffff") {
+     const siteColor = getSiteTheme()?.getCssColor?.(variableName, "");
+     const localColor = getCssString(variableName, "");
+     return resolveCssColorValue(siteColor || localColor, fallback);
+}
+
+export function getCssNumber(variableName, fallback = 0) {
+     return getSiteTheme()?.getCssNumber?.(variableName, fallback) ?? fallback;
+}
+
+export function getCssString(variableName, fallback = "") {
+     if (!document?.documentElement) {
+          return fallback;
+     }
+
+     const value = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+     return value || fallback;
+}
+
+function resolveCssColorValue(value, fallback = "#ffffff") {
+     if (!value || !document?.documentElement) {
+          return fallback;
+     }
+
+     const variablePattern = /var\(\s*(--[\w-]+)(?:\s*,\s*([^)]+))?\s*\)/g;
+     let resolvedValue = value;
+     let safety = 0;
+
+     while (resolvedValue.includes("var(") && safety < 12) {
+          safety += 1;
+          resolvedValue = resolvedValue.replace(variablePattern, (_match, variableName, variableFallback = "") => {
+               const nextValue = getCssString(variableName, "");
+               return nextValue || variableFallback.trim() || fallback;
+          });
+     }
+
+     return resolvedValue || fallback;
+}
+
+export function getCssPixelSize(variableName, fallback = 10) {
+     if (!document?.body) {
+          return fallback;
+     }
+
+     const probe = document.createElement("span");
+     probe.style.position = "absolute";
+     probe.style.visibility = "hidden";
+     probe.style.pointerEvents = "none";
+     probe.style.fontSize = `var(${variableName})`;
+     probe.textContent = "M";
+
+     document.body.appendChild(probe);
+     const resolved = parseFloat(getComputedStyle(probe).fontSize);
+     document.body.removeChild(probe);
+
+     return Number.isFinite(resolved) ? resolved : fallback;
+}
