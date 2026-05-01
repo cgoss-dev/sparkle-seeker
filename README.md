@@ -17,3 +17,4 @@ Then visit `http://localhost:8000`.
 ## Audio
 
 Place music and sound effect files in `audio/`. The current expected filenames are documented in `audio/README.md`.
+# sparkle-seeker
