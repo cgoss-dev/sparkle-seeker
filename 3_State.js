@@ -217,6 +217,19 @@ export const touchControls = {
           isPressed: false,
           pointerId: null,
           label: "\u23EF\uFE0E"
+     },
+
+     joystick: {
+          x: 0,
+          y: 0,
+          baseRadius: 0,
+          knobRadius: 0,
+          maxDistance: 0,
+          deadZone: 0,
+          pointerId: null,
+          isActive: false,
+          dx: 0,
+          dy: 0
      }
 };
 
@@ -247,6 +260,24 @@ export function clearTouchMoveTarget(pointerId) {
 
      touchControls.touchMoveTarget.pointerId = null;
      touchControls.touchMoveTarget.isActive = false;
+}
+
+export function setJoystickInput(dx, dy, pointerId) {
+     touchControls.joystick.dx = dx;
+     touchControls.joystick.dy = dy;
+     touchControls.joystick.pointerId = pointerId;
+     touchControls.joystick.isActive = true;
+}
+
+export function clearJoystickInput(pointerId = touchControls.joystick.pointerId) {
+     if (pointerId !== null && touchControls.joystick.pointerId !== pointerId) {
+          return;
+     }
+
+     touchControls.joystick.dx = 0;
+     touchControls.joystick.dy = 0;
+     touchControls.joystick.pointerId = null;
+     touchControls.joystick.isActive = false;
 }
 
 // ==================================================
@@ -509,6 +540,9 @@ export function setHarmfulLevel(value) {
 
 export function setMovementLevel(value) {
      movementLevel = Math.max(0, Math.min(3, Math.round(Number(value) || 0)));
+     touchControls.touchMoveTarget.pointerId = null;
+     touchControls.touchMoveTarget.isActive = false;
+     clearJoystickInput();
 }
 
 export function setColorLevel(value) {

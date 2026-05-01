@@ -53,6 +53,12 @@ export const optionLevelValues = [0, 0.25, 0.5, 0.75, 1];
 export const maxOptionLevelIndex = optionLevelLabels.length - 1;
 export const defaultOptionLevelIndex = 2;
 export const movementOptionLabels = ["Touch/Click", "WASD/Arrows", "Joystick Left", "Joystick Right"];
+export const movementOptionIndexes = {
+     touchClick: 0,
+     keyboard: 1,
+     joystickLeft: 2,
+     joystickRight: 3
+};
 export const maxMovementOptionIndex = movementOptionLabels.length - 1;
 export const defaultMovementOptionIndex = 0;
 export const colorOptionLabels = ["Full Color", "Black & White"];

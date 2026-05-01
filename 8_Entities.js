@@ -36,6 +36,7 @@ import {
      collisionBursts,
      sparkleSpawnTimer,
      harmfulLevel,
+     movementLevel,
      effectTimers,
      setSparkleSpawnTimer,
      addSparkleScore,
@@ -62,7 +63,8 @@ import {
      magnetCollisionRadiusMultiplier,
      statusFlashSeconds,
      gameplayStartingHealth,
-     touchArriveDistance
+     touchArriveDistance,
+     movementOptionIndexes
 } from "./4_Options.js";
 
 import {
@@ -369,6 +371,10 @@ export function clampPlayerToCanvas() {
 }
 
 function movePlayerTowardPointerTarget() {
+     if (movementLevel !== movementOptionIndexes.touchClick) {
+          return false;
+     }
+
      const target = touchControls.touchMoveTarget;
 
      if (!target?.isActive) {
@@ -393,6 +399,10 @@ function movePlayerTowardPointerTarget() {
 }
 
 function movePlayerFromKeyboard() {
+     if (movementLevel !== movementOptionIndexes.keyboard) {
+          return false;
+     }
+
      let dx = 0;
      let dy = 0;
 
@@ -422,13 +432,45 @@ function movePlayerFromKeyboard() {
 
      player.x += (dx / length) * speed * reverseMultiplier;
      player.y += (dy / length) * speed * reverseMultiplier;
+
+     return true;
+}
+
+function movePlayerFromJoystick() {
+     if (
+          movementLevel !== movementOptionIndexes.joystickLeft &&
+          movementLevel !== movementOptionIndexes.joystickRight
+     ) {
+          return false;
+     }
+
+     const joystick = touchControls.joystick;
+
+     if (!joystick?.isActive) {
+          return false;
+     }
+
+     const length = Math.hypot(joystick.dx, joystick.dy);
+     const deadZone = joystick.deadZone || 0;
+
+     if (length <= deadZone) {
+          return true;
+     }
+
+     const reverseMultiplier = isEffectActive("daze") ? -1 : 1;
+     const speed = player.speed * getPlayerMovementMultiplier();
+
+     player.x += joystick.dx * speed * reverseMultiplier;
+     player.y += joystick.dy * speed * reverseMultiplier;
+
+     return true;
 }
 
 export function updatePlayer() {
      const previousX = player.x;
      const previousY = player.y;
 
-     if (!movePlayerTowardPointerTarget()) {
+     if (!movePlayerFromJoystick() && !movePlayerTowardPointerTarget()) {
           movePlayerFromKeyboard();
      }
 

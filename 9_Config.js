@@ -254,6 +254,29 @@ export function getCanvasTheme() {
                glow: true
           },
 
+          joystick: {
+               baseRadius: uiFontLg * 1.75,
+               knobRadius: uiFontMd,
+               sideOffset: uiFontLg * 1.35,
+               bottomOffset: uiFontLg * 1.35,
+               deadZone: 0.12,
+               fill: controlFillFallback,
+               stroke: outlineFallback,
+               knobFill: bodyColor,
+               glow: true
+          },
+
+          movementArrow: {
+               font: "symbol",
+               fontSize: uiFontMd,
+               letterSpacing: 0,
+               distance: uiFontSm,
+               deadZone: 0.05,
+               color: bodyColor,
+               rainbow: false,
+               glow: true
+          },
+
           friendsEnemiesIcons: sparkleSeekerEffectIcons
      };
 

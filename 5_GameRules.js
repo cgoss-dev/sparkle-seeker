@@ -132,10 +132,10 @@ export function getAudioOptionLines() {
 
 export function getMovementOptionLines() {
      return [
-          "Touch/Click",
-          "WASD/Arrows",
-          "Joystick Left",
-          "Joystick Right"
+          "Touch/Click: move toward taps and clicks.",
+          "WASD/Arrows: keyboard-only movement.",
+          "Joystick Left: lower-left touch joystick.",
+          "Joystick Right: lower-right touch joystick."
      ];
 }
 

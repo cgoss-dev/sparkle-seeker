@@ -27,6 +27,7 @@ import {
      miniGameWidth,
      miniGameHeight,
      player,
+     keys,
      touchControls,
      sparkleScore,
      playerHealth,
@@ -69,6 +70,7 @@ import {
      maxMovementOptionIndex,
      maxColorOptionIndex,
      maxVisibleHearts,
+     movementOptionIndexes,
      getUnifiedButtonFont,
      getUnifiedButtonWidth,
      getUnifiedButtonHeight,
@@ -489,10 +491,24 @@ function updatePauseButtonBounds(theme = getCanvasTheme()) {
      button.y = canvasSpacing.uiPadding;
 }
 
+function updateJoystickBounds(theme = getCanvasTheme()) {
+     const joystick = touchControls.joystick;
+     const joystickStyle = getTextStyle(theme, "joystick");
+     const isRightSide = movementLevel === movementOptionIndexes.joystickRight;
+
+     joystick.baseRadius = joystickStyle.baseRadius;
+     joystick.knobRadius = joystickStyle.knobRadius;
+     joystick.maxDistance = Math.max(1, joystickStyle.baseRadius - joystickStyle.knobRadius);
+     joystick.deadZone = joystickStyle.deadZone;
+     joystick.x = miniGameWidth * (isRightSide ? 5 / 6 : 1 / 6);
+     joystick.y = miniGameHeight * (2 / 3);
+}
+
 export function syncUiBounds() {
      const theme = getCanvasTheme();
 
      updatePauseButtonBounds(theme);
+     updateJoystickBounds(theme);
      updateMenuUiBounds(theme);
      updateCanvasCursor();
 }
@@ -993,6 +1009,94 @@ export function drawPlayer() {
      miniGameCtx.restore();
 }
 
+function getPlayerMovementDirection() {
+     if (
+          (
+               movementLevel === movementOptionIndexes.joystickLeft ||
+               movementLevel === movementOptionIndexes.joystickRight
+          ) &&
+          touchControls.joystick.isActive
+     ) {
+          return {
+               dx: touchControls.joystick.dx,
+               dy: touchControls.joystick.dy
+          };
+     }
+
+     if (movementLevel === movementOptionIndexes.touchClick && touchControls.touchMoveTarget.isActive) {
+          return {
+               dx: touchControls.touchMoveTarget.x - player.x,
+               dy: touchControls.touchMoveTarget.y - player.y
+          };
+     }
+
+     if (movementLevel === movementOptionIndexes.keyboard) {
+          let dx = 0;
+          let dy = 0;
+
+          if (keys.a || keys.A || keys.ArrowLeft || keys.arrowleft) {
+               dx -= 1;
+          }
+
+          if (keys.d || keys.D || keys.ArrowRight || keys.arrowright) {
+               dx += 1;
+          }
+
+          if (keys.w || keys.W || keys.ArrowUp || keys.arrowup) {
+               dy -= 1;
+          }
+
+          if (keys.s || keys.S || keys.ArrowDown || keys.arrowdown) {
+               dy += 1;
+          }
+
+          return { dx, dy };
+     }
+
+     return { dx: 0, dy: 0 };
+}
+
+export function drawPlayerMovementArrow(theme) {
+     if (!miniGameCtx || gamePaused || gameMenuOpen || gameOver || gameWon) {
+          return;
+     }
+
+     const arrowStyle = getTextStyle(theme, "movementArrow");
+     const direction = getPlayerMovementDirection();
+     const length = Math.hypot(direction.dx, direction.dy);
+
+     if (length <= (arrowStyle.deadZone || 0.05)) {
+          return;
+     }
+
+     const normalizedX = direction.dx / length;
+     const normalizedY = direction.dy / length;
+     const arrowDistance = player.radius + arrowStyle.distance;
+     const arrowX = player.x + (normalizedX * arrowDistance);
+     const arrowY = player.y + (normalizedY * arrowDistance);
+     const arrowRotation = Math.atan2(normalizedY, normalizedX) + (Math.PI / 2);
+
+     miniGameCtx.save();
+     miniGameCtx.translate(arrowX, arrowY);
+     miniGameCtx.rotate(arrowRotation);
+
+     drawStyledCanvasText(
+          miniGameCtx,
+          "\u21E7",
+          0,
+          0,
+          "movementArrow",
+          theme,
+          {
+               color: arrowStyle.color,
+               align: "center",
+               baseline: "middle"
+          }
+     );
+
+     miniGameCtx.restore();
+}
+
 // ==================================================
 // RICH TEXT DRAW
 // ==================================================
@@ -1451,6 +1555,46 @@ export function drawTouchButtons(theme) {
           theme,
           button.isPressed && buttonStyle.glow
      );
+}
+
+export function drawJoystick(theme) {
+     if (
+          !miniGameCtx ||
+          (
+               movementLevel !== movementOptionIndexes.joystickLeft &&
+               movementLevel !== movementOptionIndexes.joystickRight
+          )
+     ) {
+          return;
+     }
+
+     const { colors, glow, sizes } = theme;
+     const joystick = touchControls.joystick;
+     const joystickStyle = getTextStyle(theme, "joystick");
+     const knobX = joystick.x + (joystick.dx * joystick.maxDistance);
+     const knobY = joystick.y + (joystick.dy * joystick.maxDistance);
+
+     miniGameCtx.save();
+
+     miniGameCtx.shadowColor = colors.touchGlow;
+     miniGameCtx.shadowBlur = joystickStyle.glow ? glow.uiMediumGlow : 0;
+     miniGameCtx.fillStyle = joystickStyle.fill || colors.touchFill;
+     miniGameCtx.strokeStyle = joystickStyle.stroke || colors.touchStroke;
+     miniGameCtx.lineWidth = sizes.touchBorderWidth;
+
+     miniGameCtx.beginPath();
+     miniGameCtx.arc(joystick.x, joystick.y, joystick.baseRadius, 0, Math.PI * 2);
+     miniGameCtx.fill();
+     miniGameCtx.stroke();
+
+     miniGameCtx.shadowBlur = joystick.isActive && joystickStyle.glow ? glow.uiStrongGlow : 0;
+     miniGameCtx.fillStyle = joystickStyle.knobFill || colors.touchText;
+
+     miniGameCtx.beginPath();
+     miniGameCtx.arc(knobX, knobY, joystick.knobRadius, 0, Math.PI * 2);
+     miniGameCtx.fill();
+
+     miniGameCtx.restore();
 }
 
 // ==================================================
@@ -2111,11 +2255,13 @@ export function drawGame() {
           drawCollisionBursts();
           drawPlayerTrail();
           drawPlayer();
+          drawPlayerMovementArrow(theme);
 
           drawFogOverlay();
 
           drawScore(theme);
           drawHealth(theme);
+          drawJoystick(theme);
           drawLevelPopup(theme);
 
           if (!gamePaused && !gameMenuOpen && !gameOver && !gameWon) {

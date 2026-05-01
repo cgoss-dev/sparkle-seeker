@@ -31,6 +31,7 @@ import {
      gameMenuView,
      gameOver,
      gameWon,
+     movementLevel,
      gameMenuUi,
      touchControls,
      screenActionUi,
@@ -45,6 +46,8 @@ import {
 
      setTouchMoveTarget,
      clearTouchMoveTarget,
+     setJoystickInput,
+     clearJoystickInput,
      setPauseButtonPressed,
      setPauseButtonPointerId,
      setPointerInputBound,
@@ -58,6 +61,10 @@ import {
      setOptionsSelectionRow,
      setOptionsSelectionCol
 } from "./3_State.js";
+
+import {
+     movementOptionIndexes
+} from "./4_Options.js";
 
 import {
      dismissScreenWelcomeToStart,
@@ -95,6 +102,8 @@ export function resetTouchControls() {
      touchControls.touchMoveTarget.y = 0;
      touchControls.touchMoveTarget.pointerId = null;
      touchControls.touchMoveTarget.isActive = false;
+
+     clearJoystickInput();
 
      setPauseButtonPressed(false);
      setPauseButtonPointerId(null);
@@ -267,6 +276,44 @@ function clearPointerMove(pointerId = touchControls.touchMoveTarget.pointerId) {
      }
 
      clearTouchMoveTarget(pointerId);
+}
+
+function isJoystickMovementMode() {
+     return (
+          movementLevel === movementOptionIndexes.joystickLeft ||
+          movementLevel === movementOptionIndexes.joystickRight
+     );
+}
+
+function isTouchClickMovementMode() {
+     return movementLevel === movementOptionIndexes.touchClick;
+}
+
+function isPointInsideCircle(x, y, circle) {
+     if (!circle) {
+          return false;
+     }
+
+     return Math.hypot(x - circle.x, y - circle.y) <= circle.baseRadius;
+}
+
+function setJoystickFromPoint(x, y, pointerId) {
+     const joystick = touchControls.joystick;
+     const maxDistance = joystick.maxDistance || joystick.baseRadius || 1;
+     const rawDx = x - joystick.x;
+     const rawDy = y - joystick.y;
+     const distance = Math.hypot(rawDx, rawDy);
+
+     if (distance === 0) {
+          setJoystickInput(0, 0, pointerId);
+          return;
+     }
+
+     const clampedDistance = Math.min(distance, maxDistance);
+     const normalizedX = (rawDx / distance) * (clampedDistance / maxDistance);
+     const normalizedY = (rawDy / distance) * (clampedDistance / maxDistance);
+
+     setJoystickInput(normalizedX, normalizedY, pointerId);
 }
 
 function closeMenuAndRefresh() {
@@ -623,17 +670,56 @@ function handlePauseButtonPointerUp(event, x, y) {
 }
 
 function beginPointerMove(event, x, y) {
+     if (!isTouchClickMovementMode()) {
+          return false;
+     }
+
      setTouchMoveTarget(x, y, event.pointerId);
      preventPointerDefault(event);
      return true;
 }
 
 function updatePointerMove(event, x, y) {
+     if (!isTouchClickMovementMode()) {
+          return false;
+     }
+
      if (touchControls.touchMoveTarget.pointerId !== event.pointerId) {
           return false;
      }
 
      setTouchMoveTarget(x, y, event.pointerId);
+     preventPointerDefault(event);
+     return true;
+}
+
+function beginJoystickMove(event, x, y) {
+     if (!isJoystickMovementMode() || !isPointInsideCircle(x, y, touchControls.joystick)) {
+          return false;
+     }
+
+     clearPointerMove();
+     setJoystickFromPoint(x, y, event.pointerId);
+     preventPointerDefault(event);
+     return true;
+}
+
+function updateJoystickMove(event, x, y) {
+     if (!isJoystickMovementMode() || touchControls.joystick.pointerId !== event.pointerId) {
+          return false;
+     }
+
+     setJoystickFromPoint(x, y, event.pointerId);
+     preventPointerDefault(event);
+     return true;
+}
+
+function endJoystickMove(event) {
+     if (touchControls.joystick.pointerId !== event.pointerId) {
+          return false;
+     }
+
+     clearJoystickInput(event.pointerId);
      preventPointerDefault(event);
      return true;
 }
@@ -988,6 +1074,10 @@ function handleKeyDown(event) {
           return;
      }
 
+     if (isJoystickMovementMode()) {
+          clearPointerMove();
+     }
+
      setStoredKeyState(event, true);
 
      if (isEscapeKey(event)) {
@@ -1060,6 +1150,10 @@ function handlePointerDown(event) {
           return;
      }
 
+     if (beginJoystickMove(event, x, y)) {
+          return;
+     }
+
      beginPointerMove(event, x, y);
 }
 
@@ -1069,6 +1163,11 @@ function handlePointerMove(event) {
      }
 
      const { x, y } = getCanvasPoint(event);
+
+     if (updateJoystickMove(event, x, y)) {
+          return;
+     }
+
      updatePointerMove(event, x, y);
 }
 
@@ -1083,6 +1182,10 @@ function handlePointerUp(event) {
           return;
      }
 
+     if (endJoystickMove(event)) {
+          return;
+     }
+
      endPointerMove(event);
 }
 
@@ -1092,5 +1195,6 @@ function handlePointerCancel(event) {
      }
 
      releasePauseButton(event.pointerId);
+     endJoystickMove(event);
      endPointerMove(event);
 }
