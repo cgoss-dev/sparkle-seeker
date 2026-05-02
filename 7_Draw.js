@@ -258,7 +258,6 @@ function getHoverableCanvasButtons() {
           if (gameMenuView === "options") {
                buttons.push(
                     gameMenuUi.optionsDifficultyButton,
-                    gameMenuUi.optionsAudioButton,
                     gameMenuUi.optionsMovementButton,
                     gameMenuUi.optionsColorButton
                );
@@ -387,10 +386,11 @@ function updateMenuUiBounds(theme = getCanvasTheme()) {
      if (gameMenuView === "options") {
           const optionButtons = [
                { button: gameMenuUi.optionsDifficultyButton, label: "DIFFICULTY" },
-               { button: gameMenuUi.optionsAudioButton, label: "AUDIO" },
                { button: gameMenuUi.optionsMovementButton, label: "MOVEMENT" },
                { button: gameMenuUi.optionsColorButton, label: "COLOR" }
           ];
+
+          setButtonBounds(gameMenuUi.optionsAudioButton, 0, 0, 0, 0);
 
           optionButtons.forEach((item, index) => {
                const width = getUnifiedButtonWidth(theme, item.label);
@@ -1649,10 +1649,9 @@ function drawOptionsScreen(theme) {
 
      drawMenuScreenTitle("OPTIONS", theme, layout.titleCenterX, layout.titleY);
      drawMenuButton(gameMenuUi.optionsDifficultyButton, "DIFFICULTY", theme, focused.row === 0);
-     drawMenuButton(gameMenuUi.optionsAudioButton, "AUDIO", theme, focused.row === 1);
-     drawMenuButton(gameMenuUi.optionsMovementButton, "MOVEMENT", theme, focused.row === 2);
-     drawMenuButton(gameMenuUi.optionsColorButton, "COLOR", theme, focused.row === 3);
-     drawMenuBackButton(gameMenuUi.backButton, theme, focused.row === 4);
+     drawMenuButton(gameMenuUi.optionsMovementButton, "MOVEMENT", theme, focused.row === 1);
+     drawMenuButton(gameMenuUi.optionsColorButton, "COLOR", theme, focused.row === 2);
+     drawMenuBackButton(gameMenuUi.backButton, theme, focused.row === 3);
 
      miniGameCtx.restore();
 }

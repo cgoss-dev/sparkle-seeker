@@ -452,7 +452,7 @@ function handleOptionsPointerDown(x, y) {
      }
 
      if (isPointInsideBox(x, y, gameMenuUi.backButton)) {
-          setOptionsSelectionRow(4);
+          setOptionsSelectionRow(3);
           closeMenuAndRefresh();
           return true;
      }
@@ -461,14 +461,6 @@ function handleOptionsPointerDown(x, y) {
           setOptionsSelectionRow(0);
           setOptionsSelectionCol(0);
           setGameMenuView("options_difficulty");
-          syncUiBounds();
-          return true;
-     }
-
-     if (isPointInsideBox(x, y, gameMenuUi.optionsAudioButton)) {
-          setOptionsSelectionRow(0);
-          setOptionsSelectionCol(0);
-          setGameMenuView("options_audio");
           syncUiBounds();
           return true;
      }
@@ -782,15 +774,14 @@ function activateTipsSelection() {
 }
 
 function activateOptionsSelection() {
-     if (optionsSelection.row === 4) {
+     if (optionsSelection.row === 3) {
           closeMenuAndRefresh();
           return;
      }
 
      const optionView =
           optionsSelection.row === 0 ? "options_difficulty" :
-          optionsSelection.row === 1 ? "options_audio" :
-          optionsSelection.row === 2 ? "options_movement" :
+          optionsSelection.row === 1 ? "options_movement" :
           "options_color";
 
      setOptionsSelectionRow(0);
@@ -989,14 +980,14 @@ function handleOptionsNavigation(event) {
 
      if (isUpKey(event)) {
           event.preventDefault();
-          setOptionsSelectionRow(clamp(optionsSelection.row - 1, 0, 4));
+          setOptionsSelectionRow(clamp(optionsSelection.row - 1, 0, 3));
           setOptionsSelectionCol(0);
           return true;
      }
 
      if (isDownKey(event)) {
           event.preventDefault();
-          setOptionsSelectionRow(clamp(optionsSelection.row + 1, 0, 4));
+          setOptionsSelectionRow(clamp(optionsSelection.row + 1, 0, 3));
           setOptionsSelectionCol(0);
           return true;
      }
