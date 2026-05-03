@@ -141,7 +141,8 @@ export function getMovementOptionLines() {
 export function getColorOptionLines() {
      return [
           "High Contrast: bombs red, sparkles blue, effects green.",
-          "Rainbow: original rainbow board.",
+          "Vibrant: original rainbow board.",
+          "Pastel: soft Catppuccin Mocha board.",
           "Black & White: monochrome accessibility board."
      ];
 }

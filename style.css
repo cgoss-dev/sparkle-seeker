@@ -33,6 +33,20 @@
           --12bit-11: #f0f;
           --12bit-12: #f08;
 
+     /* CATPPUCCIN MOCHA PALETTE */
+          --mocha-01: #f5c2e7;
+          --mocha-02: #cba6f7;
+          --mocha-03: #f38ba8;
+          --mocha-04: #eba0ac;
+          --mocha-05: #fab387;
+          --mocha-06: #f9e2af;
+          --mocha-07: #a6e3a1;
+          --mocha-08: #94e2d5;
+          --mocha-09: #89dceb;
+          --mocha-10: #74c7ec;
+          --mocha-11: #89b4fa;
+          --mocha-12: #b4befe;
+
      /* TYPOGRAPHY */
           --font-body: "Noto Sans Mono", monospace;
           --font-display: "Bungee Shade", monospace;

@@ -801,7 +801,7 @@ function getShortMovementOptionLabel(levelIndex) {
 }
 
 function getShortColorOptionLabel(levelIndex) {
-     const labels = ["HIGH CONTRAST", "RAINBOW", "B&W"];
+     const labels = ["HIGH CONTRAST", "VIBRANT", "PASTEL", "Black & White"];
 
      return labels[levelIndex] || getColorOptionLabel(levelIndex).toUpperCase();
 }
@@ -823,7 +823,7 @@ function resetCanvasColorModeFilter() {
 }
 
 function getCanvasGlowColor(color) {
-     return colorLevel === 2
+     return colorLevel === 3
           ? getCssColor("--color-white", "#ffffff")
           : color;
 }
@@ -897,6 +897,7 @@ export function drawOptionStepper(
      const canDecrease = levelIndex > 0;
      const canIncrease = levelIndex < maxLevelIndex;
      const optionTextColor = optionsStyle.color || colors.controlText;
+     const activeArrowColor = getCssColor("--color-white", "#ffffff");
      const arrowScale = optionsStyle.arrowScale || 1;
      const arrowFont = getTextFont(theme, "buttonsOptions", 700, null, optionsStyle.fontSize * arrowScale);
 
@@ -911,7 +912,7 @@ export function drawOptionStepper(
                "\u21E7",
                0,
                0,
-               optionTextColor,
+               isEnabled ? activeArrowColor : optionTextColor,
                arrowFont,
                "center",
                "middle",

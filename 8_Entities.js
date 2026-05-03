@@ -180,6 +180,8 @@ const particleColorEngine = {
      engine: null
 };
 
+let pastelParticleColorIndex = 0;
+
 function ensureParticleColorEngine() {
      if (!particleColorEngine.engine) {
           const createEngine = siteTheme?.createColorEngine;
@@ -211,7 +213,20 @@ function getNextParticleColor() {
      return particleColorEngine.engine.next() || "#ffffff";
 }
 
-function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
+function getNextPastelColorIndex() {
+     const colorIndex = pastelParticleColorIndex % 12;
+     pastelParticleColorIndex += 1;
+     return colorIndex;
+}
+
+function getPastelParticleColor(colorIndex = 0) {
+     const normalizedIndex = (Math.round(Number(colorIndex) || 0) % 12) + 1;
+     const variableName = `--mocha-${String(normalizedIndex).padStart(2, "0")}`;
+
+     return getCssColor(variableName, "#f5c2e7");
+}
+
+function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex = 0) {
      if (colorLevel === 0) {
           if (colorRole === "sparkle") {
                return getCssColor("--12bit-08", "#0bf");
@@ -227,6 +242,10 @@ function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
      }
 
      if (colorLevel === 2) {
+          return getPastelParticleColor(colorIndex);
+     }
+
+     if (colorLevel === 3) {
           if (colorRole === "sparkle") {
                return getCssColor("--color-gray2", "#666");
           }
@@ -244,11 +263,11 @@ function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
 }
 
 function getParticleFillColor(particle) {
-     return getHighContrastParticleColor(particle.colorRole, particle.color);
+     return getModeParticleColor(particle.colorRole, particle.color, particle.colorIndex);
 }
 
 function getParticleGlowColor(fillColor) {
-     return colorLevel === 2
+     return colorLevel === 3
           ? getCssColor("--color-white", "#ffffff")
           : fillColor;
 }
@@ -258,6 +277,7 @@ export function resetEntityColorCycle() {
           particleColorEngine.engine.reset();
      }
 
+     pastelParticleColorIndex = 0;
      particleColorEngine.engine = null;
 }
 
@@ -736,6 +756,7 @@ export function createSparkle() {
           size: Math.random() * (getGameParticleSizeMax() - getGameParticleSizeMin()) + getGameParticleSizeMin(),
           particle: sparkleParticles[Math.floor(Math.random() * sparkleParticles.length)],
           colorRole: "sparkle",
+          colorIndex: getNextPastelColorIndex(),
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
           wobbleSpeed: 0.02 + Math.random() * 0.03,
@@ -754,6 +775,7 @@ function createHealthHazard() {
           size: randomNumber(getGameParticleSizeMin() * 1.1, getGameParticleSizeMax() * 1.15),
           particle: bombParticles[Math.floor(Math.random() * bombParticles.length)],
           colorRole: "bomb",
+          colorIndex: getNextPastelColorIndex(),
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
           wobbleSpeed: 0.02 + Math.random() * 0.03,
@@ -886,6 +908,7 @@ function createEffectPickup(type, category) {
           type,
           category,
           colorRole: "effect",
+          colorIndex: getNextPastelColorIndex(),
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
           wobbleSpeed: 0.02 + Math.random() * 0.03,
@@ -997,6 +1020,7 @@ export function createCollisionBurst(x, y, color, burstType, colorRole = null) {
                size: randomNumber(20, 30),
                particle: randomItem(burstChars),
                colorRole: colorRole || (burstType === "harmful" ? "bomb" : "sparkle"),
+               colorIndex: getNextPastelColorIndex(),
                color,
                glowBoost: burstType === "harmful" ? 1.25 : 1
           });
