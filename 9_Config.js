@@ -257,12 +257,12 @@ export function getCanvasTheme() {
           },
 
           joystick: {
-               baseRadius: uiFontLg * 1.25,
-               knobRadius: uiFontMd * 0.8,
-               edgeGap: uiFontSm * 0.35,
-               yOffset: uiFontLg * 0.75,
+               baseRadius: uiFontLg * 2.5,
+               knobRadius: uiFontMd * 1.6,
+               edgeGap: uiFontSm * 0.15,
+               yOffset: 0,
                deadZone: 0.12,
-               fill: getCssColor("--translu-max", "rgba(0, 0, 0, 0.2)"),
+               fill: "rgba(0, 0, 0, 0)",
                stroke: outlineFallback,
                knobFill: bodyColor,
                glow: true

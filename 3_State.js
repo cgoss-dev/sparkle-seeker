@@ -539,7 +539,7 @@ export function setHarmfulLevel(value) {
 }
 
 export function setMovementLevel(value) {
-     movementLevel = Math.max(0, Math.min(3, Math.round(Number(value) || 0)));
+     movementLevel = Math.max(0, Math.min(2, Math.round(Number(value) || 0)));
      touchControls.touchMoveTarget.pointerId = null;
      touchControls.touchMoveTarget.isActive = false;
      clearJoystickInput();

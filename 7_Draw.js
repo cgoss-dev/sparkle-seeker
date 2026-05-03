@@ -503,7 +503,7 @@ function updateJoystickBounds(theme = getCanvasTheme()) {
      const isRightSide = movementLevel === movementOptionIndexes.joystickRight;
      const edgeGap = joystickStyle.edgeGap || 0;
      const canvasMin = Math.min(miniGameWidth, miniGameHeight);
-     const baseRadius = Math.min(joystickStyle.baseRadius, canvasMin * 0.12);
+     const baseRadius = Math.min(joystickStyle.baseRadius, canvasMin * 0.24);
      const knobRadius = Math.min(joystickStyle.knobRadius, baseRadius * 0.55);
 
      joystick.baseRadius = baseRadius;
@@ -795,20 +795,19 @@ function getShortOptionLevelLabel(levelIndex) {
 }
 
 function getShortMovementOptionLabel(levelIndex) {
-     return getMovementOptionLabel(levelIndex)
-          .replace(/\//g, "")
-          .replace(/\s+/g, levelIndex === movementOptionIndexes.joystickRight ? " " : "")
-          .toUpperCase();
+     const labels = ["TOUCHCLICK/WASDARROWS", "JOYSTICKLEFT", "JOYSTICK RIGHT"];
+
+     return labels[levelIndex] || getMovementOptionLabel(levelIndex).toUpperCase();
 }
 
 function getShortColorOptionLabel(levelIndex) {
-     const labels = ["FULL COLOR", "B&W", "HIGH CONTRAST"];
+     const labels = ["HIGH CONTRAST", "RAINBOW", "B&W"];
 
      return labels[levelIndex] || getColorOptionLabel(levelIndex).toUpperCase();
 }
 
 function getCanvasColorModeFilter() {
-     return colorLevel === 1 ? "grayscale(1) contrast(1.2)" : "none";
+     return colorLevel === 2 ? "grayscale(1) contrast(1.2)" : "none";
 }
 
 function applyCanvasColorModeFilter() {
@@ -824,7 +823,7 @@ function resetCanvasColorModeFilter() {
 }
 
 function getCanvasGlowColor(color) {
-     return colorLevel === 1
+     return colorLevel === 2
           ? getCssColor("--color-white", "#ffffff")
           : color;
 }

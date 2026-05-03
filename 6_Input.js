@@ -286,7 +286,7 @@ function isJoystickMovementMode() {
 }
 
 function isTouchClickMovementMode() {
-     return movementLevel === movementOptionIndexes.touchClick;
+     return movementLevel === movementOptionIndexes.pointerKeyboard;
 }
 
 function isPointInsideCircle(x, y, circle) {

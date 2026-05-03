@@ -132,8 +132,7 @@ export function getAudioOptionLines() {
 
 export function getMovementOptionLines() {
      return [
-          "Touch/Click: move toward taps and clicks.",
-          "WASD/Arrows: keyboard-only movement.",
+          "Touch/Click + WASD/Arrows: pointer and keyboard movement.",
           "Joystick Left: lower-left touch joystick.",
           "Joystick Right: lower-right touch joystick."
      ];
@@ -141,9 +140,9 @@ export function getMovementOptionLines() {
 
 export function getColorOptionLines() {
      return [
-          "Full Color: original rainbow board.",
-          "Black & White: monochrome accessibility board.",
-          "High Contrast: bombs red, sparkles blue, effects green."
+          "High Contrast: bombs red, sparkles blue, effects green.",
+          "Rainbow: original rainbow board.",
+          "Black & White: monochrome accessibility board."
      ];
 }
 

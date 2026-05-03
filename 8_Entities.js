@@ -212,7 +212,7 @@ function getNextParticleColor() {
 }
 
 function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
-     if (colorLevel === 2) {
+     if (colorLevel === 0) {
           if (colorRole === "sparkle") {
                return getCssColor("--12bit-08", "#0bf");
           }
@@ -234,7 +234,7 @@ function getParticleFillColor(particle) {
 }
 
 function getParticleGlowColor(fillColor) {
-     return colorLevel === 1
+     return colorLevel === 2
           ? getCssColor("--color-white", "#ffffff")
           : fillColor;
 }
@@ -401,7 +401,7 @@ export function clampPlayerToCanvas() {
 }
 
 function movePlayerTowardPointerTarget() {
-     if (movementLevel !== movementOptionIndexes.touchClick) {
+     if (movementLevel !== movementOptionIndexes.pointerKeyboard) {
           return false;
      }
 
@@ -429,7 +429,7 @@ function movePlayerTowardPointerTarget() {
 }
 
 function movePlayerFromKeyboard() {
-     if (movementLevel !== movementOptionIndexes.keyboard) {
+     if (movementLevel !== movementOptionIndexes.pointerKeyboard) {
           return false;
      }
 
