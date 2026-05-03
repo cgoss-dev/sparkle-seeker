@@ -228,15 +228,15 @@ function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
 
      if (colorLevel === 2) {
           if (colorRole === "sparkle") {
-               return getCssColor("--color-gray2", "#999");
+               return getCssColor("--color-gray2", "#666");
           }
 
           if (colorRole === "bomb") {
-               return getCssColor("--color-gray1", "#666");
+               return getCssColor("--color-black", "#111");
           }
 
           if (colorRole === "effect") {
-               return getCssColor("--color-gray3", "#ccc");
+               return getCssColor("--color-white", "#fff");
           }
      }
 
