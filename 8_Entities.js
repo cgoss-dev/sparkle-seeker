@@ -226,6 +226,20 @@ function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
           }
      }
 
+     if (colorLevel === 2) {
+          if (colorRole === "sparkle") {
+               return getCssColor("--color-gray2", "#999");
+          }
+
+          if (colorRole === "bomb") {
+               return getCssColor("--color-gray1", "#666");
+          }
+
+          if (colorRole === "effect") {
+               return getCssColor("--color-gray3", "#ccc");
+          }
+     }
+
      return fallback;
 }
 

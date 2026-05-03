@@ -807,7 +807,7 @@ function getShortColorOptionLabel(levelIndex) {
 }
 
 function getCanvasColorModeFilter() {
-     return colorLevel === 2 ? "grayscale(1) contrast(1.2)" : "none";
+     return "none";
 }
 
 function applyCanvasColorModeFilter() {
