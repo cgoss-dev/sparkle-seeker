@@ -487,9 +487,9 @@ function updateMenuUiBounds(theme = getCanvasTheme()) {
 
 function updatePauseButtonBounds(theme = getCanvasTheme()) {
      const button = touchControls.pauseButton;
-     const canvasSpacing = getTextStyle(theme, "canvasSpacing");
      const buttonStyle = getTextStyle(theme, "pauseButton");
-     const buttonSize = buttonStyle.fontSize + canvasSpacing.uiPadding;
+     const canvasSpacing = getTextStyle(theme, "canvasSpacing");
+     const buttonSize = buttonStyle.buttonSize || (buttonStyle.fontSize + canvasSpacing.uiPadding);
 
      button.width = buttonSize;
      button.height = buttonSize;
@@ -568,7 +568,7 @@ export function drawPanelBox(x, y, width, height, theme, lineWidth = null) {
      const { colors, glow, sizes } = theme;
      const resolvedLineWidth = lineWidth ?? sizes.panelBorderWidth;
 
-     miniGameCtx.shadowColor = colors.controlGlow;
+     miniGameCtx.shadowColor = getCanvasGlowColor(colors.controlGlow);
      miniGameCtx.shadowBlur = glow.uiStrongGlow;
 
      drawRoundedRect(x, y, width, height, sizes.controlRadius);
@@ -602,7 +602,7 @@ function drawGlowingCanvasText(ctx, text, x, y, color, font, align = "left", bas
      ctx.textAlign = align;
      ctx.textBaseline = baseline;
      ctx.fillStyle = color;
-     ctx.shadowColor = color;
+     ctx.shadowColor = getCanvasGlowColor(color);
 
      if (!shouldGlow) {
           ctx.shadowBlur = 0;
@@ -790,10 +790,6 @@ export function drawMenuScreenTitle(title, theme, centerX, y) {
      miniGameCtx.restore();
 }
 
-function getUiArrowFont(theme) {
-     return getTextFont(theme, "buttonsOptions", 700);
-}
-
 function getShortOptionLevelLabel(levelIndex) {
      return getOptionLevelLabel(levelIndex).toUpperCase();
 }
@@ -806,11 +802,13 @@ function getShortMovementOptionLabel(levelIndex) {
 }
 
 function getShortColorOptionLabel(levelIndex) {
-     return getColorOptionLabel(levelIndex).toUpperCase();
+     const labels = ["FULL COLOR", "B&W", "HC COLOR", "HC BW"];
+
+     return labels[levelIndex] || getColorOptionLabel(levelIndex).toUpperCase();
 }
 
 function getCanvasColorModeFilter() {
-     return colorLevel === 1 ? "grayscale(1) contrast(1.2)" : "none";
+     return colorLevel === 1 || colorLevel === 3 ? "grayscale(1) contrast(1.2)" : "none";
 }
 
 function applyCanvasColorModeFilter() {
@@ -823,6 +821,12 @@ function resetCanvasColorModeFilter() {
      if (miniGameCtx) {
           miniGameCtx.filter = "none";
      }
+}
+
+function getCanvasGlowColor(color) {
+     return colorLevel === 1 || colorLevel === 3
+          ? getCssColor("--color-white", "#ffffff")
+          : color;
 }
 
 function drawUnifiedTextButton(button, label, theme, isFocused = false, fontWeight = 400, fontSize = null) {
@@ -839,15 +843,13 @@ function drawUnifiedTextButton(button, label, theme, isFocused = false, fontWeig
      miniGameCtx.save();
      miniGameCtx.strokeStyle = isFocused ? colors.fontColor : colors.outlineStrong;
      miniGameCtx.lineWidth = isFocused ? sizes.borderWidthFocus : sizes.borderWidth;
-     miniGameCtx.shadowColor = isFocused ? colors.fontColor : colors.controlGlow;
+     miniGameCtx.shadowColor = getCanvasGlowColor(isFocused ? colors.fontColor : colors.controlGlow);
      miniGameCtx.shadowBlur = isFocused ? glow.uiStrongGlow : glow.uiSoftGlow;
 
      drawRoundedRect(button.x, button.y, button.width, button.height, sizes.controlRadius);
 
-     if (isFocused) {
-          miniGameCtx.fillStyle = colors.controlFill;
-          miniGameCtx.fill();
-     }
+     miniGameCtx.fillStyle = colors.controlFill;
+     miniGameCtx.fill();
 
      miniGameCtx.stroke();
      miniGameCtx.restore();
@@ -896,7 +898,8 @@ export function drawOptionStepper(
      const canDecrease = levelIndex > 0;
      const canIncrease = levelIndex < maxLevelIndex;
      const optionTextColor = optionsStyle.color || colors.controlText;
-     const arrowFont = getUiArrowFont(theme);
+     const arrowScale = optionsStyle.arrowScale || 1;
+     const arrowFont = getTextFont(theme, "buttonsOptions", 700, null, optionsStyle.fontSize * arrowScale);
 
      function drawStepperArrow(button, rotation, isEnabled, isFocused) {
           miniGameCtx.save();
@@ -923,15 +926,13 @@ export function drawOptionStepper(
      miniGameCtx.save();
      miniGameCtx.strokeStyle = isRowFocused ? colors.fontColor : colors.outlineStrong;
      miniGameCtx.lineWidth = isRowFocused ? sizes.borderWidthFocus : sizes.borderWidth;
-     miniGameCtx.shadowColor = isRowFocused ? colors.fontColor : colors.controlGlow;
+     miniGameCtx.shadowColor = getCanvasGlowColor(isRowFocused ? colors.fontColor : colors.controlGlow);
      miniGameCtx.shadowBlur = isRowFocused ? glow.uiStrongGlow : glow.uiSoftGlow;
 
      drawRoundedRect(row.x, row.y, row.width, row.height, sizes.controlRadius);
 
-     if (isRowFocused) {
-          miniGameCtx.fillStyle = colors.controlFill;
-          miniGameCtx.fill();
-     }
+     miniGameCtx.fillStyle = colors.controlFill;
+     miniGameCtx.fill();
 
      miniGameCtx.stroke();
      miniGameCtx.restore();
@@ -965,7 +966,7 @@ export function drawControlButton(button, isPressed, theme) {
      const radius = button.width / 3;
 
      miniGameCtx.save();
-     miniGameCtx.shadowColor = colors.touchGlow;
+     miniGameCtx.shadowColor = getCanvasGlowColor(colors.touchGlow);
      miniGameCtx.shadowBlur = isPressed ? glow.uiStrongGlow : glow.uiMediumGlow;
 
      miniGameCtx.beginPath();
@@ -999,7 +1000,7 @@ export function drawPlayerTrail() {
           miniGameCtx.save();
           miniGameCtx.globalAlpha = Math.max(0, lifeRatio * 0.75);
           miniGameCtx.strokeStyle = trail.color;
-          miniGameCtx.shadowColor = trail.color;
+          miniGameCtx.shadowColor = getCanvasGlowColor(trail.color);
           miniGameCtx.shadowBlur = glowBlur;
           miniGameCtx.lineWidth = Math.max(1, trail.width * lifeRatio);
           miniGameCtx.lineCap = "round";
@@ -1243,7 +1244,7 @@ export function drawScore(theme) {
      miniGameCtx.textAlign = "left";
      miniGameCtx.textBaseline = "top";
      miniGameCtx.fillStyle = circleMeterStyle.color || colors.meterFull;
-     miniGameCtx.shadowColor = circleMeterStyle.color || colors.meterGlow;
+     miniGameCtx.shadowColor = getCanvasGlowColor(circleMeterStyle.color || colors.meterGlow);
      miniGameCtx.shadowBlur = circleMeterStyle.glow ? glow.uiSoftGlow : 0;
      miniGameCtx.font = getTextFont(theme, "circleMeters", 400);
 
@@ -1334,7 +1335,7 @@ export function drawHealth(theme) {
      miniGameCtx.textAlign = "right";
      miniGameCtx.textBaseline = "top";
      miniGameCtx.fillStyle = circleMeterStyle.color || colors.statusText;
-     miniGameCtx.shadowColor = circleMeterStyle.color || colors.statusTextGlow;
+     miniGameCtx.shadowColor = getCanvasGlowColor(circleMeterStyle.color || colors.statusTextGlow);
      miniGameCtx.shadowBlur = circleMeterStyle.glow ? glow.uiSoftGlow : 0;
 
      miniGameCtx.font = getTextFont(theme, "circleMeters", 400);
@@ -1519,7 +1520,7 @@ export function drawJoystick(theme) {
 
      miniGameCtx.save();
 
-     miniGameCtx.shadowColor = colors.touchGlow;
+     miniGameCtx.shadowColor = getCanvasGlowColor(colors.touchGlow);
      miniGameCtx.shadowBlur = joystickStyle.glow ? glow.uiMediumGlow : 0;
      miniGameCtx.fillStyle = joystickStyle.fill || colors.touchFill;
      miniGameCtx.strokeStyle = joystickStyle.stroke || colors.touchStroke;
@@ -1582,7 +1583,7 @@ function drawMenuDetailLines(theme, lines, startY) {
      miniGameCtx.fillStyle = detailStyle.color || colors.fontColor;
      miniGameCtx.textAlign = "left";
      miniGameCtx.textBaseline = "top";
-     miniGameCtx.shadowColor = detailStyle.color || colors.fontColor;
+     miniGameCtx.shadowColor = getCanvasGlowColor(detailStyle.color || colors.fontColor);
      miniGameCtx.shadowBlur = 0;
      miniGameCtx.font = getTextFont(theme, "buttonsOptions", 400);
 
@@ -1653,7 +1654,7 @@ function drawTipsDetailScreen(theme, title, lines) {
 function getOptionDescriptionY(layout, rowCount = 1) {
      const rowStackHeight = (rowCount * layout.buttonHeight) + (Math.max(0, rowCount - 1) * layout.rowGap);
 
-     return layout.contentTopY + rowStackHeight + layout.rowGap;
+     return layout.contentTopY + rowStackHeight + layout.titleGap;
 }
 
 function drawOptionsScreen(theme) {

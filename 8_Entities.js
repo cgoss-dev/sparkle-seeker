@@ -37,6 +37,7 @@ import {
      sparkleSpawnTimer,
      harmfulLevel,
      movementLevel,
+     colorLevel,
      effectTimers,
      setSparkleSpawnTimer,
      addSparkleScore,
@@ -73,7 +74,8 @@ import {
 
 import {
      sparkleSeekerEffectIcons,
-     sparkleSeekerRainbowPalette
+     sparkleSeekerRainbowPalette,
+     getCssColor
 } from "./9_Config.js";
 
 import {
@@ -207,6 +209,48 @@ function ensureParticleColorEngine() {
 function getNextParticleColor() {
      ensureParticleColorEngine();
      return particleColorEngine.engine.next() || "#ffffff";
+}
+
+function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
+     if (colorLevel === 2) {
+          if (colorRole === "sparkle") {
+               return getCssColor("--12bit-08", "#0bf");
+          }
+
+          if (colorRole === "bomb") {
+               return getCssColor("--12bit-01", "#f00");
+          }
+
+          if (colorRole === "effect") {
+               return getCssColor("--12bit-05", "#0f0");
+          }
+     }
+
+     if (colorLevel === 3) {
+          if (colorRole === "sparkle") {
+               return getCssColor("--color-gray3", "#d0d0d0");
+          }
+
+          if (colorRole === "bomb") {
+               return getCssColor("--color-gray2", "#808080");
+          }
+
+          if (colorRole === "effect") {
+               return getCssColor("--color-white", "#ffffff");
+          }
+     }
+
+     return fallback;
+}
+
+function getParticleFillColor(particle) {
+     return getHighContrastParticleColor(particle.colorRole, particle.color);
+}
+
+function getParticleGlowColor(fillColor) {
+     return colorLevel === 1 || colorLevel === 3
+          ? getCssColor("--color-white", "#ffffff")
+          : fillColor;
 }
 
 export function resetEntityColorCycle() {
@@ -691,6 +735,7 @@ export function createSparkle() {
           speed: 0.25 + Math.random() * 0.5,
           size: Math.random() * (getGameParticleSizeMax() - getGameParticleSizeMin()) + getGameParticleSizeMin(),
           particle: sparkleParticles[Math.floor(Math.random() * sparkleParticles.length)],
+          colorRole: "sparkle",
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
           wobbleSpeed: 0.02 + Math.random() * 0.03,
@@ -708,6 +753,7 @@ function createHealthHazard() {
           speed: 0.3 + Math.random() * 0.6,
           size: randomNumber(getGameParticleSizeMin() * 1.1, getGameParticleSizeMax() * 1.15),
           particle: bombParticles[Math.floor(Math.random() * bombParticles.length)],
+          colorRole: "bomb",
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
           wobbleSpeed: 0.02 + Math.random() * 0.03,
@@ -839,6 +885,7 @@ function createEffectPickup(type, category) {
           particle: type.particle,
           type,
           category,
+          colorRole: "effect",
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
           wobbleSpeed: 0.02 + Math.random() * 0.03,
@@ -891,7 +938,7 @@ export function updateEffectPickups() {
 }
 
 function collectHelpfulEffect(pickup, index) {
-     createCollisionBurst(pickup.x, pickup.y, pickup.color, "sparkle");
+     createCollisionBurst(pickup.x, pickup.y, pickup.color, "sparkle", "effect");
      effectPickups.splice(index, 1);
 
      applyHelpfulEffect(pickup.type);
@@ -901,7 +948,7 @@ function collectHelpfulEffect(pickup, index) {
 }
 
 function collectHarmfulEffect(pickup, index) {
-     createCollisionBurst(pickup.x, pickup.y, pickup.color, "harmful");
+     createCollisionBurst(pickup.x, pickup.y, pickup.color, "harmful", "effect");
      effectPickups.splice(index, 1);
 
      applyHarmfulEffect(pickup.type);
@@ -933,7 +980,7 @@ export function collectEffectPickups() {
 
 export const burstChars = ["✦", "✧", "·", "•"];
 
-export function createCollisionBurst(x, y, color, burstType) {
+export function createCollisionBurst(x, y, color, burstType, colorRole = null) {
      for (let i = 0; i < collisionBurstParticleCount; i += 1) {
           const angle = randomNumber(0, Math.PI * 2);
           const speed = burstType === "harmful"
@@ -949,6 +996,7 @@ export function createCollisionBurst(x, y, color, burstType) {
                maxLife: 50,
                size: randomNumber(20, 30),
                particle: randomItem(burstChars),
+               colorRole: colorRole || (burstType === "harmful" ? "bomb" : "sparkle"),
                color,
                glowBoost: burstType === "harmful" ? 1.25 : 1
           });
@@ -990,11 +1038,12 @@ export function drawSparkles() {
 
      for (let i = sparkles.length - 1; i >= 0; i -= 1) {
           const sparkle = sparkles[i];
+          const fillColor = getParticleFillColor(sparkle);
 
           miniGameCtx.save();
           miniGameCtx.font = `${Math.max(16, sparkle.size)}px Arial, Helvetica, sans-serif`;
-          miniGameCtx.fillStyle = sparkle.color;
-          miniGameCtx.shadowColor = sparkle.color;
+          miniGameCtx.fillStyle = fillColor;
+          miniGameCtx.shadowColor = getParticleGlowColor(fillColor);
           miniGameCtx.shadowBlur = glowBlur;
 
           miniGameCtx.globalAlpha = 0.95;
@@ -1020,11 +1069,12 @@ export function drawHealthHazards() {
 
      for (let i = healthHazards.length - 1; i >= 0; i -= 1) {
           const hazard = healthHazards[i];
+          const fillColor = getParticleFillColor(hazard);
 
           miniGameCtx.save();
           miniGameCtx.font = `${Math.max(16, hazard.size)}px Arial, Helvetica, sans-serif`;
-          miniGameCtx.fillStyle = hazard.color;
-          miniGameCtx.shadowColor = hazard.color;
+          miniGameCtx.fillStyle = fillColor;
+          miniGameCtx.shadowColor = getParticleGlowColor(fillColor);
           miniGameCtx.shadowBlur = glowBlur;
 
           miniGameCtx.fillText(hazard.particle, hazard.x, hazard.y);
@@ -1048,6 +1098,7 @@ export function drawEffectPickups() {
 
      for (let i = effectPickups.length - 1; i >= 0; i -= 1) {
           const pickup = effectPickups[i];
+          const fillColor = getParticleFillColor(pickup);
 
           const pickupSizeBoost =
                pickup.type?.name === "luck" ? 1.25 :
@@ -1059,8 +1110,8 @@ export function drawEffectPickups() {
 
           miniGameCtx.save();
           miniGameCtx.font = `${pickupFontSize}px Arial, Helvetica, sans-serif`;
-          miniGameCtx.fillStyle = pickup.color;
-          miniGameCtx.shadowColor = pickup.color;
+          miniGameCtx.fillStyle = fillColor;
+          miniGameCtx.shadowColor = getParticleGlowColor(fillColor);
           miniGameCtx.shadowBlur = glowBlur;
 
           miniGameCtx.globalAlpha = pickup.category === "helpful" ? 1 : 0.95;
@@ -1089,11 +1140,12 @@ export function drawCollisionBursts() {
           const lifeRatio = burst.life / burst.maxLife;
           const sizeMultiplier = 0.7 + ((1 - lifeRatio) * 0.6);
           const burstSize = burst.size * sizeMultiplier;
+          const fillColor = getParticleFillColor(burst);
 
           miniGameCtx.save();
           miniGameCtx.font = `${burstSize}px Arial, Helvetica, sans-serif`;
-          miniGameCtx.fillStyle = burst.color;
-          miniGameCtx.shadowColor = burst.color;
+          miniGameCtx.fillStyle = fillColor;
+          miniGameCtx.shadowColor = getParticleGlowColor(fillColor);
           miniGameCtx.shadowBlur = glowBlur * burst.glowBoost * lifeRatio;
 
           miniGameCtx.globalAlpha = Math.max(0, lifeRatio * 0.95);

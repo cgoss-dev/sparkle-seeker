@@ -236,6 +236,7 @@ export function getCanvasTheme() {
           buttonsOptions: {
                font: "body",
                fontSize: uiFontSm,
+               arrowScale: 3,
                letterSpacing: 0,
                buttonExteriorPadding: uiFontSm,
                buttonHeight: uiFontMd,
@@ -247,7 +248,8 @@ export function getCanvasTheme() {
 
           pauseButton: {
                font: "body",
-               fontSize: uiFontSm * 1.25,
+               fontSize: uiFontSm * 2.5,
+               buttonSize: uiFontSm * 4.5,
                letterSpacing: 0,
                color: bodyColor,
                rainbow: false,
