@@ -95,6 +95,8 @@ import {
      drawCollisionBursts,
      playerFaces,
      playerTrail,
+     getParticleFillColor,
+     getParticleGlowColor,
      resetPlayerPosition,
      clampPlayerToCanvas,
      updatePlayer,
@@ -651,7 +653,7 @@ function getRichTextIcon(theme, tokenName) {
 }
 
 function getRainbowTextColor(theme, style, letterIndex) {
-     const palette = style.palette || theme.colors.titleRainbow || [];
+     const palette = getColorModeTextPalette(theme, style);
 
      if (!palette.length) {
           return style.color || theme.colors.titleText || theme.colors.fontColor;
@@ -661,6 +663,33 @@ function getRainbowTextColor(theme, style, letterIndex) {
      const cycleOffset = Math.floor(performance.now() / cycleMs);
 
      return palette[(letterIndex + cycleOffset) % palette.length];
+}
+
+function getColorModeTextPalette(theme, style) {
+     if (colorLevel === 0) {
+          return [
+               getCssColor("--12bit-01", "#f00"),
+               getCssColor("--12bit-08", "#0bf"),
+               getCssColor("--12bit-05", "#0f0")
+          ];
+     }
+
+     if (colorLevel === 2) {
+          return Array.from({ length: 12 }, (_item, index) => {
+               const variableName = `--mocha-${String(index + 1).padStart(2, "0")}`;
+               return getCssColor(variableName, "#f5c2e7");
+          });
+     }
+
+     if (colorLevel === 3) {
+          return [
+               getCssColor("--color-gray2", "#666"),
+               getCssColor("--color-gray3", "#999"),
+               getCssColor("--color-white", "#fff")
+          ];
+     }
+
+     return style.palette || theme.colors.titleRainbow || [];
 }
 
 function drawStyledCanvasText(
@@ -996,11 +1025,13 @@ export function drawPlayerTrail() {
      for (let i = playerTrail.length - 1; i >= 0; i -= 1) {
           const trail = playerTrail[i];
           const lifeRatio = trail.life / trail.maxLife;
+          const trailColor = getParticleFillColor(trail);
+          const trailGlowColor = getParticleGlowColor(trailColor);
 
           miniGameCtx.save();
           miniGameCtx.globalAlpha = Math.max(0, lifeRatio * 0.75);
-          miniGameCtx.strokeStyle = trail.color;
-          miniGameCtx.shadowColor = getCanvasGlowColor(trail.color);
+          miniGameCtx.strokeStyle = trailColor;
+          miniGameCtx.shadowColor = getCanvasGlowColor(trailGlowColor);
           miniGameCtx.shadowBlur = glowBlur;
           miniGameCtx.lineWidth = Math.max(1, trail.width * lifeRatio);
           miniGameCtx.lineCap = "round";

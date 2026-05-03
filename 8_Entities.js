@@ -27,6 +27,7 @@ import {
      keys,
      touchControls,
      gamePaused,
+     gameWon,
      playerHealth,
      sparkleScore,
      scoreMultiplier,
@@ -226,7 +227,7 @@ function getPastelParticleColor(colorIndex = 0) {
      return getCssColor(variableName, "#f5c2e7");
 }
 
-function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex = 0) {
+export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex = 0) {
      if (colorLevel === 0) {
           if (colorRole === "sparkle") {
                return getCssColor("--12bit-08", "#0bf");
@@ -238,6 +239,10 @@ function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex = 0) {
 
           if (colorRole === "effect") {
                return getCssColor("--12bit-05", "#0f0");
+          }
+
+          if (colorRole === "trail") {
+               return getCssColor("--12bit-08", "#0bf");
           }
      }
 
@@ -257,16 +262,20 @@ function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex = 0) {
           if (colorRole === "effect") {
                return getCssColor("--color-white", "#fff");
           }
+
+          if (colorRole === "trail") {
+               return getCssColor("--color-gray2", "#666");
+          }
      }
 
      return fallback;
 }
 
-function getParticleFillColor(particle) {
+export function getParticleFillColor(particle) {
      return getModeParticleColor(particle.colorRole, particle.color, particle.colorIndex);
 }
 
-function getParticleGlowColor(fillColor) {
+export function getParticleGlowColor(fillColor) {
      return colorLevel === 3
           ? getCssColor("--color-white", "#ffffff")
           : fillColor;
@@ -324,6 +333,8 @@ function createPlayerTrail(fromX, fromY, toX, toY) {
                fromY: trailFromY + (normalY * offset),
                toX: toX + (normalX * offset),
                toY: toY + (normalY * offset),
+               colorRole: "trail",
+               colorIndex: getNextPastelColorIndex(),
                color: getNextParticleColor(),
                life,
                maxLife: life,
@@ -554,7 +565,7 @@ export function updatePlayerFaceState() {
      applyPlayerLevelScale();
 
      if (gamePaused) {
-          player.char = playerFaces.neutral;
+          player.char = gameWon ? playerFaces.sparkle : playerFaces.neutral;
           player.hitScale = 1;
           return;
      }
