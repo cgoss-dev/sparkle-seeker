@@ -226,20 +226,6 @@ function getHighContrastParticleColor(colorRole, fallback = "#ffffff") {
           }
      }
 
-     if (colorLevel === 3) {
-          if (colorRole === "sparkle") {
-               return getCssColor("--color-gray3", "#d0d0d0");
-          }
-
-          if (colorRole === "bomb") {
-               return getCssColor("--color-gray2", "#808080");
-          }
-
-          if (colorRole === "effect") {
-               return getCssColor("--color-white", "#ffffff");
-          }
-     }
-
      return fallback;
 }
 
@@ -248,7 +234,7 @@ function getParticleFillColor(particle) {
 }
 
 function getParticleGlowColor(fillColor) {
-     return colorLevel === 1 || colorLevel === 3
+     return colorLevel === 1
           ? getCssColor("--color-white", "#ffffff")
           : fillColor;
 }

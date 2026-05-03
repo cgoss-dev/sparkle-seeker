@@ -143,8 +143,7 @@ export function getColorOptionLines() {
      return [
           "Full Color: original rainbow board.",
           "Black & White: monochrome accessibility board.",
-          "High Contrast Color: bombs red, sparkles blue, effects green.",
-          "High Contrast BW: bombs gray, sparkles light gray, effects white."
+          "High Contrast: bombs red, sparkles blue, effects green."
      ];
 }
 

@@ -61,7 +61,7 @@ export const movementOptionIndexes = {
 };
 export const maxMovementOptionIndex = movementOptionLabels.length - 1;
 export const defaultMovementOptionIndex = 0;
-export const colorOptionLabels = ["Full Color", "Black & White", "High Contrast Color", "High Contrast BW"];
+export const colorOptionLabels = ["Full Color", "Black & White", "High Contrast"];
 export const maxColorOptionIndex = colorOptionLabels.length - 1;
 export const defaultColorOptionIndex = 0;
 

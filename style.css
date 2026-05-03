@@ -8,12 +8,16 @@
           --color-gray3: #ccc;
           --color-white: #fff;
           --color-rainbow: #f0f;
-          --translu-max: rgba(0, 0, 0, 0.2);
-          --translu-med: rgba(0, 0, 0, 0.4);
-          --translu-low: rgba(0, 0, 0, 0.6);
-          --translu-min: rgba(0, 0, 0, 0.8);
-          --opacity-min: rgba(255, 255, 255, 0.2);
-          --opacity-low: rgba(255, 255, 255, 0.4);
+
+     /* TRANSLUCENCE */
+          --translu-max: rgba(0, 0, 0, 0.25);
+          --translu-med: rgba(0, 0, 0, 0.5);
+          --translu-min: rgba(0, 0, 0, 0.75);
+
+     /* OPACITY */
+          --opacity-min: rgba(255, 255, 255, 0.25);
+          --opacity-med: rgba(255, 255, 255, 0.5);
+          --opacity-max: rgba(255, 255, 255, 0.75);
 
      /* 12-BIT PALETTE */
           --12bit-01: #f00;

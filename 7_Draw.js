@@ -802,13 +802,13 @@ function getShortMovementOptionLabel(levelIndex) {
 }
 
 function getShortColorOptionLabel(levelIndex) {
-     const labels = ["FULL COLOR", "B&W", "HC COLOR", "HC BW"];
+     const labels = ["FULL COLOR", "B&W", "HIGH CONTRAST"];
 
      return labels[levelIndex] || getColorOptionLabel(levelIndex).toUpperCase();
 }
 
 function getCanvasColorModeFilter() {
-     return colorLevel === 1 || colorLevel === 3 ? "grayscale(1) contrast(1.2)" : "none";
+     return colorLevel === 1 ? "grayscale(1) contrast(1.2)" : "none";
 }
 
 function applyCanvasColorModeFilter() {
@@ -824,7 +824,7 @@ function resetCanvasColorModeFilter() {
 }
 
 function getCanvasGlowColor(color) {
-     return colorLevel === 1 || colorLevel === 3
+     return colorLevel === 1
           ? getCssColor("--color-white", "#ffffff")
           : color;
 }
