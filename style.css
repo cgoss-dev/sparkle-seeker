@@ -3,9 +3,9 @@
 :root {
      /* COLORS */
           --color-black: #111;
-          --color-gray1: #333;
-          --color-gray2: #666;
-          --color-gray3: #999;
+          --color-gray1: #666;
+          --color-gray2: #999;
+          --color-gray3: #ccc;
           --color-white: #fff;
           --color-rainbow: #f0f;
           --translu-max: rgba(0, 0, 0, 0.2);
