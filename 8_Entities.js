@@ -115,7 +115,7 @@ export const framesPerSecond = 60;
 
 export const sparkleSpawnDelay = 25;
 export const sparkleSpawnCap = 50;
-export const bombSpawnRatio = 0.5;
+export const hazardSpawnRatio = 0.5;
 export const effectPickupCap = 60;
 export const collisionBurstParticleCount = 15;
 
@@ -233,7 +233,7 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
                return getCssColor("--12bit-08", "#0bf");
           }
 
-          if (colorRole === "bomb") {
+          if (colorRole === "hazard") {
                return getCssColor("--12bit-01", "#f00");
           }
 
@@ -255,7 +255,7 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
                return getCssColor("--color-gray2", "#666");
           }
 
-          if (colorRole === "bomb") {
+          if (colorRole === "hazard") {
                return getCssColor("--color-black", "#111");
           }
 
@@ -736,7 +736,7 @@ function getObjectFallSpeedMultiplier() {
 // ==================================================
 
 export const sparkleParticles = ["✦", "✧"];
-export const bombParticles = ["\u2716\uFE0E", "\u2715\uFE0E"];
+export const hazardParticles = ["\u2716\uFE0E", "\u2715\uFE0E"];
 
 function getSparkleCollisionRadiusMultiplier() {
      if (!isEffectActive("magnet")) {
@@ -784,8 +784,8 @@ function createHealthHazard() {
           y: -20,
           speed: 0.3 + Math.random() * 0.6,
           size: randomNumber(getGameParticleSizeMin() * 1.1, getGameParticleSizeMax() * 1.15),
-          particle: bombParticles[Math.floor(Math.random() * bombParticles.length)],
-          colorRole: "bomb",
+          particle: hazardParticles[Math.floor(Math.random() * hazardParticles.length)],
+          colorRole: "hazard",
           colorIndex: getNextPastelColorIndex(),
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
@@ -799,11 +799,11 @@ function createMatchingHealthHazardFromSparkleSpawn() {
           return;
      }
 
-     if (Math.random() > bombSpawnRatio) {
+     if (Math.random() > hazardSpawnRatio) {
           return;
      }
 
-     if (healthHazards.length >= sparkleSpawnCap * bombSpawnRatio) {
+     if (healthHazards.length >= sparkleSpawnCap * hazardSpawnRatio) {
           return;
      }
 
@@ -1030,7 +1030,7 @@ export function createCollisionBurst(x, y, color, burstType, colorRole = null) {
                maxLife: 50,
                size: randomNumber(20, 30),
                particle: randomItem(burstChars),
-               colorRole: colorRole || (burstType === "harmful" ? "bomb" : "sparkle"),
+               colorRole: colorRole || (burstType === "harmful" ? "hazard" : "sparkle"),
                colorIndex: getNextPastelColorIndex(),
                color,
                glowBoost: burstType === "harmful" ? 1.25 : 1

@@ -93,7 +93,7 @@ export function getCurrentPausedActionTexts() {
 export function getHowToPlayLines() {
      return [
           "Seek sparkles to level and heal.",
-          "Avoid bombs. They deal damage.",
+          "Avoid hazards. They deal damage.",
           getWinGoalText()
      ];
 }
@@ -113,7 +113,7 @@ export function getEffectLines() {
 export function getDifficultyOptionLines() {
      return [
           "OFF: sparkles only.",
-          "MIN: sparkles and bombs; bombs fall 1 per 2 sparkles.",
+          "MIN: sparkles and hazards; hazards fall 1 per 2 sparkles.",
           "LOW: effects fall 1 per 24 sparkles.",
           "MED: effects fall 1 per 16 sparkles.",
           "MAX: effects fall 1 per 8 sparkles."
@@ -140,7 +140,7 @@ export function getMovementOptionLines() {
 
 export function getColorOptionLines() {
      return [
-          "High Contrast: bombs red, sparkles blue, effects green.",
+          "High Contrast: hazards red, sparkles blue, effects green.",
           "Vibrant: original rainbow board.",
           "Pastel: soft Catppuccin Mocha board.",
           "Black & White: monochrome accessibility board."
