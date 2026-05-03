@@ -112,11 +112,11 @@ export function getEffectLines() {
 
 export function getDifficultyOptionLines() {
      return [
-          "OFF: Sparkles Only",
-          "MIN: Sparkles and Bombs",
-          "LOW: Effects, Low",
-          "MED: Effects, Medium",
-          "MAX: Effects, Maximum"
+          "OFF: sparkles only.",
+          "MIN: sparkles and bombs; bombs fall 1 per 2 sparkles.",
+          "LOW: effects fall 1 per 24 sparkles.",
+          "MED: effects fall 1 per 16 sparkles.",
+          "MAX: effects fall 1 per 8 sparkles."
      ];
 }
 
@@ -141,8 +141,8 @@ export function getMovementOptionLines() {
 
 export function getColorOptionLines() {
      return [
-          "Full Color",
-          "Black & White"
+          "Full Color: original rainbow board.",
+          "Black & White: monochrome accessibility board."
      ];
 }
 

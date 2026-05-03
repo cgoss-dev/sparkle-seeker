@@ -70,6 +70,9 @@ import {
      maxColorOptionIndex,
      maxVisibleHearts,
      movementOptionIndexes,
+     getOptionLevelLabel,
+     getMovementOptionLabel,
+     getColorOptionLabel,
      getUnifiedButtonFont,
      getUnifiedButtonWidth,
      getUnifiedButtonHeight,
@@ -791,8 +794,35 @@ function getUiArrowFont(theme) {
      return getTextFont(theme, "buttonsOptions", 700);
 }
 
-function getOptionLineForLevel(lines, levelIndex) {
-     return lines[levelIndex] || lines[0] || "";
+function getShortOptionLevelLabel(levelIndex) {
+     return getOptionLevelLabel(levelIndex).toUpperCase();
+}
+
+function getShortMovementOptionLabel(levelIndex) {
+     return getMovementOptionLabel(levelIndex)
+          .replace(/\//g, "")
+          .replace(/\s+/g, levelIndex === movementOptionIndexes.joystickRight ? " " : "")
+          .toUpperCase();
+}
+
+function getShortColorOptionLabel(levelIndex) {
+     return getColorOptionLabel(levelIndex).toUpperCase();
+}
+
+function getCanvasColorModeFilter() {
+     return colorLevel === 1 ? "grayscale(1) contrast(1.2)" : "none";
+}
+
+function applyCanvasColorModeFilter() {
+     if (miniGameCtx) {
+          miniGameCtx.filter = getCanvasColorModeFilter();
+     }
+}
+
+function resetCanvasColorModeFilter() {
+     if (miniGameCtx) {
+          miniGameCtx.filter = "none";
+     }
 }
 
 function drawUnifiedTextButton(button, label, theme, isFocused = false, fontWeight = 400, fontSize = null) {
@@ -865,10 +895,30 @@ export function drawOptionStepper(
      const centerY = row.y + (row.height / 2);
      const canDecrease = levelIndex > 0;
      const canIncrease = levelIndex < maxLevelIndex;
-     const decreaseAlpha = canDecrease ? 1 : 0.28;
-     const increaseAlpha = canIncrease ? 1 : 0.28;
      const optionTextColor = optionsStyle.color || colors.controlText;
      const arrowFont = getUiArrowFont(theme);
+
+     function drawStepperArrow(button, rotation, isEnabled, isFocused) {
+          miniGameCtx.save();
+          miniGameCtx.globalAlpha = isEnabled ? 1 : 0.28;
+          miniGameCtx.translate(button.x + (button.width / 2), centerY + 1);
+          miniGameCtx.rotate(rotation);
+
+          drawGlowingCanvasText(
+               miniGameCtx,
+               "\u21E7",
+               0,
+               0,
+               optionTextColor,
+               arrowFont,
+               "center",
+               "middle",
+               theme,
+               isEnabled && isFocused && optionsStyle.glow
+          );
+
+          miniGameCtx.restore();
+     }
 
      miniGameCtx.save();
      miniGameCtx.strokeStyle = isRowFocused ? colors.fontColor : colors.outlineStrong;
@@ -886,21 +936,7 @@ export function drawOptionStepper(
      miniGameCtx.stroke();
      miniGameCtx.restore();
 
-     miniGameCtx.save();
-     miniGameCtx.globalAlpha = decreaseAlpha;
-     drawGlowingCanvasText(
-          miniGameCtx,
-          "<",
-          decreaseButton.x + (decreaseButton.width / 2),
-          centerY + 1,
-          optionTextColor,
-          arrowFont,
-          "center",
-          "middle",
-          theme,
-          canDecrease && focusedSide === 0 && optionsStyle.glow
-     );
-     miniGameCtx.restore();
+     drawStepperArrow(decreaseButton, -Math.PI / 2, canDecrease, focusedSide === 0);
 
      drawGlowingCanvasText(
           miniGameCtx,
@@ -915,21 +951,7 @@ export function drawOptionStepper(
           isRowFocused && optionsStyle.glow
      );
 
-     miniGameCtx.save();
-     miniGameCtx.globalAlpha = increaseAlpha;
-     drawGlowingCanvasText(
-          miniGameCtx,
-          ">",
-          increaseButton.x + (increaseButton.width / 2),
-          centerY + 1,
-          optionTextColor,
-          arrowFont,
-          "center",
-          "middle",
-          theme,
-          canIncrease && focusedSide === 1 && optionsStyle.glow
-     );
-     miniGameCtx.restore();
+     drawStepperArrow(increaseButton, Math.PI / 2, canIncrease, focusedSide === 1);
 }
 
 export function drawControlButton(button, isPressed, theme) {
@@ -1677,7 +1699,7 @@ function drawDifficultyOptionsScreen(theme) {
           gameMenuUi.harmfulDecreaseButton,
           gameMenuUi.harmfulIncreaseButton,
           "Difficulty",
-          getOptionLineForLevel(optionLines, harmfulLevel),
+          getShortOptionLevelLabel(harmfulLevel),
           harmfulLevel,
           theme,
           focused.row === 0,
@@ -1710,7 +1732,7 @@ function drawAudioOptionsScreen(theme) {
           gameMenuUi.musicDecreaseButton,
           gameMenuUi.musicIncreaseButton,
           "Music",
-          getOptionLineForLevel(optionLines, musicLevel),
+          getShortOptionLevelLabel(musicLevel),
           musicLevel,
           theme,
           focused.row === 0,
@@ -1722,7 +1744,7 @@ function drawAudioOptionsScreen(theme) {
           gameMenuUi.soundEffectsDecreaseButton,
           gameMenuUi.soundEffectsIncreaseButton,
           "Sound FX",
-          getOptionLineForLevel(optionLines, soundEffectsLevel),
+          getShortOptionLevelLabel(soundEffectsLevel),
           soundEffectsLevel,
           theme,
           focused.row === 1,
@@ -1755,7 +1777,7 @@ function drawMovementOptionsScreen(theme) {
           gameMenuUi.movementDecreaseButton,
           gameMenuUi.movementIncreaseButton,
           "Movement",
-          getOptionLineForLevel(optionLines, movementLevel),
+          getShortMovementOptionLabel(movementLevel),
           movementLevel,
           theme,
           focused.row === 0,
@@ -1789,7 +1811,7 @@ function drawColorOptionsScreen(theme) {
           gameMenuUi.colorDecreaseButton,
           gameMenuUi.colorIncreaseButton,
           "Color",
-          getOptionLineForLevel(optionLines, colorLevel),
+          getShortColorOptionLabel(colorLevel),
           colorLevel,
           theme,
           focused.row === 0,
@@ -2161,9 +2183,11 @@ export function drawGame() {
 
      ensureCanvasHoverTracking();
      drawMiniGameBackground();
+     applyCanvasColorModeFilter();
 
      if (isScreenWelcomeActive()) {
           drawGameWelcomeOverlay(theme);
+          resetCanvasColorModeFilter();
           updateCanvasCursor();
           return;
      }
@@ -2214,5 +2238,6 @@ export function drawGame() {
           drawGameStatusOverlay(theme);
      }
 
+     resetCanvasColorModeFilter();
      updateCanvasCursor();
 }
