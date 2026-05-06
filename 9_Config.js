@@ -143,7 +143,7 @@ export function getCanvasTheme() {
      const uiFontSm = getCssPixelSize("--font-size-sm", 10);
 
      const menuOverlayFill = "rgba(0, 0, 0, 0.75)";
-     const controlFillFallback = getCssColor("--game-control-fill", getCssColor("--translu-max", "rgba(0, 0, 0, 0.25)"));
+     const controlFillFallback = getCssColor("--game-control-fill", getCssColor("--black-25", "rgba(0, 0, 0, 0.25)"));
      const outlineFallback = getCssColor("--game-outline-strong", getCssColor("--color-gray3", "#777777"));
 
      const text = {

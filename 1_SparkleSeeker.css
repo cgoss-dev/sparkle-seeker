@@ -32,7 +32,7 @@
           --ui-border-width-focus: var(--border-md);
           --ui-touch-border-width: var(--border-lg);
           --ui-touch-border-color: var(--color-gray3);
-          --ui-touch-fill: var(--translu-max);
+          --ui-touch-fill: var(--black-25);
           --ui-touch-glow: var(--color-white);
           --ui-touch-text-color: var(--color-white);
 

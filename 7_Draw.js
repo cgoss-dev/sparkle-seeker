@@ -1215,7 +1215,7 @@ export function drawMiniGameBackground() {
      }
 
      miniGameCtx.clearRect(0, 0, miniGameWidth, miniGameHeight);
-     miniGameCtx.fillStyle = getCssColor("--translu-med", "rgba(0, 0, 0, 0.5)");
+     miniGameCtx.fillStyle = getCssColor("--black-50", "rgba(0, 0, 0, 0.5)");
      miniGameCtx.fillRect(0, 0, miniGameWidth, miniGameHeight);
 }
 
