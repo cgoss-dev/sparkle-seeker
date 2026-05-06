@@ -4,8 +4,10 @@
      /* COLORS */
           --color-black: #111;
           --color-gray1: #333;
-          --color-gray2: #666;
-          --color-gray3: #999;
+          --color-gray2: #555;
+          --color-gray3: #777;
+          --color-gray4: #999;
+          --color-gray5: #bbb;
           --color-white: #fff;
           --color-rainbow: #f0f;
 

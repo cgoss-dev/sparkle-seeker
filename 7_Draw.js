@@ -683,8 +683,8 @@ function getColorModeTextPalette(theme, style) {
 
      if (colorLevel === 3) {
           return [
-               getCssColor("--color-gray2", "#666"),
-               getCssColor("--color-gray3", "#999"),
+               getCssColor("--color-gray2", "#555"),
+               getCssColor("--color-gray3", "#777"),
                getCssColor("--color-white", "#fff")
           ];
      }
@@ -1267,7 +1267,7 @@ export function drawScore(theme) {
      const levelStatusStyle = getTextStyle(theme, "levelStatus");
      const scoreReadyStyle = getTextStyle(theme, "scoreReady");
      const scoreIconStyle = getTextStyle(theme, "scoreIcon");
-     const levelText = "LEVEL";
+     const levelText = "LEVELS";
      const sparkleText = String(sparkleScore).padStart(3, "0");
      const levelMeterUnits = getCurrentLevelMeterUnits();
 

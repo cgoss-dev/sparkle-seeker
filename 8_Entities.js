@@ -242,7 +242,7 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
           }
 
           if (colorRole === "trail") {
-               return getCssColor("--12bit-08", "#0bf");
+               return getCssColor("--color-white", "#fff");
           }
      }
 
@@ -252,7 +252,7 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
 
      if (colorLevel === 3) {
           if (colorRole === "sparkle") {
-               return getCssColor("--color-gray2", "#666");
+               return getCssColor("--color-gray2", "#555");
           }
 
           if (colorRole === "hazard") {
@@ -264,7 +264,7 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
           }
 
           if (colorRole === "trail") {
-               return getCssColor("--color-gray2", "#666");
+               return getCssColor("--color-gray2", "#555");
           }
      }
 
