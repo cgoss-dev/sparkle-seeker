@@ -2,12 +2,11 @@
 
 :root {
      /* COLORS */
-          --color-black: #111;
+          --color-black: #000;
           --color-gray1: #333;
-          --color-gray2: #555;
-          --color-gray3: #777;
-          --color-gray4: #999;
-          --color-gray5: #bbb;
+          --color-gray2: #666;
+          --color-gray3: #999;
+          --color-gray4: #ccc;
           --color-white: #fff;
           --color-rainbow: #f0f;
 
@@ -21,19 +20,19 @@
           --white-50: rgba(255, 255, 255, 0.5);
           --white-75: rgba(255, 255, 255, 0.75);
 
-     /* KATE MORLEY 12-BIT PALETTE */
-          --12bit-01: #f00;
-          --12bit-02: #f80;
-          --12bit-03: #ff0;
-          --12bit-04: #bf0;
-          --12bit-05: #0f0;
-          --12bit-06: #0fb;
-          --12bit-07: #0ff;
-          --12bit-08: #0bf;
-          --12bit-09: #00f;
-          --12bit-10: #80f;
-          --12bit-11: #f0f;
-          --12bit-12: #f08;
+     /* TERTIARY PALETTE */
+          --tertiary-01: #f00;
+          --tertiary-02: #f40;
+          --tertiary-03: #f80;
+          --tertiary-04: #fc0;
+          --tertiary-05:    #ff0;
+          --tertiary-06: #8f0;
+          --tertiary-07: #0f0;
+          --tertiary-08: #08f;
+          --tertiary-09: #00f;
+          --tertiary-10: #40f;
+          --tertiary-11: #80f;
+          --tertiary-12: #f0f;
 
      /* CATPPUCCIN MOCHA PALETTE */
           --mocha-01: #f38ba8;

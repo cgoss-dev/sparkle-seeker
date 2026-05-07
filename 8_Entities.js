@@ -230,15 +230,15 @@ function getPastelParticleColor(colorIndex = 0) {
 export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex = 0) {
      if (colorLevel === 0) {
           if (colorRole === "sparkle") {
-               return getCssColor("--12bit-08", "#0bf");
+               return getCssColor("--tertiary-08", "#08f");
           }
 
           if (colorRole === "hazard") {
-               return getCssColor("--12bit-01", "#f00");
+               return getCssColor("--tertiary-01", "#f00");
           }
 
           if (colorRole === "effect") {
-               return getCssColor("--12bit-05", "#0f0");
+               return getCssColor("--tertiary-07", "#0f0");
           }
 
           if (colorRole === "trail") {
@@ -252,11 +252,11 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
 
      if (colorLevel === 3) {
           if (colorRole === "sparkle") {
-               return getCssColor("--color-gray2", "#555");
+               return getCssColor("--color-gray2", "#666");
           }
 
           if (colorRole === "hazard") {
-               return getCssColor("--color-black", "#111");
+               return getCssColor("--color-black", "#000");
           }
 
           if (colorRole === "effect") {
@@ -264,7 +264,7 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
           }
 
           if (colorRole === "trail") {
-               return getCssColor("--color-gray2", "#555");
+               return getCssColor("--color-gray2", "#666");
           }
      }
 

@@ -136,15 +136,15 @@ function getSiteTheme() {
 
 export function getCanvasTheme() {
      const fontColor = getCssColor("--game-color-text", getCssColor("--color-white", "#ffffff"));
-     const bodyColor = getCssColor("--game-color-body", getCssColor("--color-gray3", "#808080"));
-     const titleColor = getCssColor("--game-color-title", getCssColor("--color-gray3", "#808080"));
+     const bodyColor = getCssColor("--game-color-body", getCssColor("--color-gray3", "#999999"));
+     const titleColor = getCssColor("--game-color-title", getCssColor("--color-gray3", "#999999"));
      const uiFontLg = getCssPixelSize("--font-size-lg", 20);
      const uiFontMd = getCssPixelSize("--font-size-md", 15);
      const uiFontSm = getCssPixelSize("--font-size-sm", 10);
 
      const menuOverlayFill = "rgba(0, 0, 0, 0.75)";
      const controlFillFallback = getCssColor("--game-control-fill", getCssColor("--black-25", "rgba(0, 0, 0, 0.25)"));
-     const outlineFallback = getCssColor("--game-outline-strong", getCssColor("--color-gray3", "#777777"));
+     const outlineFallback = getCssColor("--game-outline-strong", getCssColor("--color-gray3", "#999999"));
 
      const text = {
           canvasSpacing: {

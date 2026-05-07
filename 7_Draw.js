@@ -668,9 +668,9 @@ function getRainbowTextColor(theme, style, letterIndex) {
 function getColorModeTextPalette(theme, style) {
      if (colorLevel === 0) {
           return [
-               getCssColor("--12bit-01", "#f00"),
-               getCssColor("--12bit-08", "#0bf"),
-               getCssColor("--12bit-05", "#0f0")
+               getCssColor("--tertiary-01", "#f00"),
+               getCssColor("--tertiary-08", "#08f"),
+               getCssColor("--tertiary-07", "#0f0")
           ];
      }
 
@@ -683,8 +683,8 @@ function getColorModeTextPalette(theme, style) {
 
      if (colorLevel === 3) {
           return [
-               getCssColor("--color-gray2", "#555"),
-               getCssColor("--color-gray3", "#777"),
+               getCssColor("--color-gray2", "#666"),
+               getCssColor("--color-gray3", "#999"),
                getCssColor("--color-white", "#fff")
           ];
      }
