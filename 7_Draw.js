@@ -132,6 +132,7 @@ import {
      getCurrentScreenTitleLines,
      getGameWelcomeAlpha,
      getLevelPopupText,
+     getLevelPopupSubtext,
      getLevelPopupAlpha,
      getGameOverlayAlpha
 } from "./2_GameEngine.js";
@@ -2237,6 +2238,7 @@ function drawGameStatusOverlay(theme) {
 
 function drawLevelPopup(theme) {
      const popupText = getLevelPopupText();
+     const popupSubtext = getLevelPopupSubtext();
      const alpha = getLevelPopupAlpha();
 
      if (!miniGameCtx || !popupText || alpha <= 0 || gameMenuOpen || gameOver || gameWon) {
@@ -2246,7 +2248,9 @@ function drawLevelPopup(theme) {
      const { colors } = theme;
      const canvasSpacing = getTextStyle(theme, "canvasSpacing");
      const titleStyle = getTextStyle(theme, "title");
+     const subtextStyle = getTextStyle(theme, "scoreReady");
      const panelPadding = canvasSpacing.uiPadding;
+     const gapBetweenLines = popupSubtext ? canvasSpacing.uiRowGap : 0;
      const popupY = miniGameHeight * 0.28;
 
      miniGameCtx.save();
@@ -2255,10 +2259,25 @@ function drawLevelPopup(theme) {
      miniGameCtx.textBaseline = "middle";
      miniGameCtx.font = getTextFont(theme, "title", 400);
 
-     const panelWidth = miniGameCtx.measureText(popupText).width + (panelPadding * 2);
-     const panelHeight = titleStyle.fontSize + (panelPadding * 2);
+     const titleWidth = miniGameCtx.measureText(popupText).width;
+     let subtextWidth = 0;
+
+     if (popupSubtext) {
+          miniGameCtx.font = getTextFont(theme, "scoreReady", 400);
+          subtextWidth = miniGameCtx.measureText(popupSubtext).width;
+     }
+
+     const panelWidth = Math.max(titleWidth, subtextWidth) + (panelPadding * 2);
+     const panelHeight =
+          titleStyle.fontSize +
+          (popupSubtext ? subtextStyle.fontSize + gapBetweenLines : 0) +
+          (panelPadding * 2);
      const panelX = (miniGameWidth - panelWidth) / 2;
      const panelY = popupY - (panelHeight / 2);
+     const titleY = popupSubtext
+          ? popupY - ((subtextStyle.fontSize + gapBetweenLines) / 2)
+          : popupY;
+     const subtextY = titleY + (titleStyle.fontSize / 2) + gapBetweenLines + (subtextStyle.fontSize / 2);
 
      drawPanelBox(panelX, panelY, panelWidth, panelHeight, theme);
 
@@ -2266,7 +2285,7 @@ function drawLevelPopup(theme) {
           miniGameCtx,
           popupText,
           miniGameWidth / 2,
-          popupY,
+          titleY,
           "title",
           theme,
           {
@@ -2275,6 +2294,21 @@ function drawLevelPopup(theme) {
                baseline: "middle"
           }
      );
+
+     if (popupSubtext) {
+          drawGlowingCanvasText(
+               miniGameCtx,
+               popupSubtext,
+               miniGameWidth / 2,
+               subtextY,
+               subtextStyle.color || colors.fontColor,
+               getTextFont(theme, "scoreReady", 400),
+               "center",
+               "middle",
+               theme,
+               subtextStyle.glow
+          );
+     }
 
      miniGameCtx.restore();
 }

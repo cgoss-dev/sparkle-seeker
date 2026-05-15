@@ -33,33 +33,38 @@ import {
 export const winScore = 1000;
 export const startOverlayDuration = 120;
 export const overlayFadeFrames = 30;
-export const levelPopupDuration = 120;
+export const levelPopupDuration = 180;
 export const maxLevelProgressUnits = 10;
 export const progressUnitsPerCircle = 2;
 
 const levelEnemyProgression = [
      {
           introText: "",
+          introDescription: "",
           hazardsUnlocked: false,
           harmfulEffectNames: []
      },
      {
           introText: "HAZARDS",
+          introDescription: "Costs health.",
           hazardsUnlocked: true,
           harmfulEffectNames: []
      },
      {
           introText: "FREEZE",
+          introDescription: "Freezes player.",
           hazardsUnlocked: true,
           harmfulEffectNames: ["freeze"]
      },
      {
           introText: "DAZE",
+          introDescription: "Reverses controls.",
           hazardsUnlocked: true,
           harmfulEffectNames: ["freeze", "daze"]
      },
      {
           introText: "FOG",
+          introDescription: "Limits vision.",
           hazardsUnlocked: true,
           harmfulEffectNames: ["freeze", "daze", "fog"]
      }
@@ -73,6 +78,7 @@ const levelRules = Array.from({ length: maxLevelProgressUnits }, (_, index) => {
           levelNumber: index + 1,
           scoreMin: index * 100,
           introText: index < levelEnemyProgression.length ? progression.introText : "",
+          introDescription: index < levelEnemyProgression.length ? progression.introDescription : "",
           hazardsUnlocked: progression.hazardsUnlocked,
           harmfulEffectNames: progression.harmfulEffectNames
      };
@@ -184,7 +190,7 @@ export function getMovementOptionLines() {
 
 export function getColorOptionLines() {
      return [
-          "High Contrast: white sparkles, orange hazards, and blue friendlies.",
+          "High Contrast: yellow sparkles, red hazards, and blue friendlies.",
           "Vibrant: white sparkles; hazards and effects use rainbow colors.",
           "Pastel: white sparkles; hazards and effects use soft Catppuccin Mocha colors.",
           "Black & White: monochrome accessibility board."
@@ -234,4 +240,10 @@ export function getLevelIntroText(levelNumber) {
      const levelData = levelRules.find((rule) => rule.levelNumber === levelNumber);
 
      return levelData?.introText || "";
+}
+
+export function getLevelIntroDescription(levelNumber) {
+     const levelData = levelRules.find((rule) => rule.levelNumber === levelNumber);
+
+     return levelData?.introDescription || "";
 }

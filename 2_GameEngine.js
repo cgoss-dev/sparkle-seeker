@@ -107,6 +107,7 @@ import {
      startOverlayDuration,
      overlayFadeFrames,
      levelPopupDuration,
+     getLevelIntroDescription,
      getLevelIntroText,
      getCurrentLevelNumber,
      getScreenTitleLinesForMode
@@ -136,6 +137,7 @@ let screenLayerDuration = -1;
 let gameScreenMode = "screenWelcome";
 let activeLevelNumber = 1;
 let levelPopupText = "";
+let levelPopupSubtext = "";
 let levelPopupTimer = 0;
 let levelPopupDurationFrames = 0;
 
@@ -483,16 +485,19 @@ export function clearGameOverlay() {
 function resetLevelProgressState() {
      activeLevelNumber = getCurrentLevelNumber();
      levelPopupText = "";
+     levelPopupSubtext = "";
      levelPopupTimer = 0;
      levelPopupDurationFrames = 0;
 }
 
 function showLevelPopup(levelNumber) {
      const introText = getLevelIntroText(levelNumber);
+     const introDescription = getLevelIntroDescription(levelNumber);
 
      levelPopupText = introText
           ? `LEVEL ${levelNumber}: ${introText}`
           : `LEVEL ${levelNumber}`;
+     levelPopupSubtext = introDescription;
      levelPopupTimer = levelPopupDuration;
      levelPopupDurationFrames = levelPopupDuration;
 }
@@ -506,6 +511,7 @@ function updateLevelPopupTimer() {
 
      if (levelPopupTimer <= 0) {
           levelPopupText = "";
+          levelPopupSubtext = "";
           levelPopupTimer = 0;
           levelPopupDurationFrames = 0;
      }
@@ -524,6 +530,10 @@ function syncLevelProgressState() {
 
 export function getLevelPopupText() {
      return levelPopupText;
+}
+
+export function getLevelPopupSubtext() {
+     return levelPopupSubtext;
 }
 
 export function getLevelPopupAlpha() {
