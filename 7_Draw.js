@@ -1929,6 +1929,7 @@ function drawSharedActionScreen(
      const resolvedInstructionLines = Array.isArray(instructionLines) ? instructionLines.filter(Boolean) : [];
      const instructionGap = resolvedInstructionLines.length ? canvasSpacing.uiRowGap : 0;
      const instructionLineHeight = buttonStyle.fontSize * 1.35;
+     const websiteActionText = "DEVELOPER WEBSITE";
 
      miniGameCtx.save();
      miniGameCtx.globalAlpha = overlayAlpha;
@@ -1950,11 +1951,18 @@ function drawSharedActionScreen(
      }));
 
      const actionGap = canvasSpacing.betweenButtons;
+     const actionRowGap = canvasSpacing.uiRowGap;
      const tallestButtonHeight = getUnifiedButtonHeight(
           theme,
           buttonStyle.fontSize,
           buttonStyle.buttonExteriorPadding
      );
+     const primaryActions = measuredActions.filter((item) => item.text !== websiteActionText);
+     const websiteActions = measuredActions.filter((item) => item.text === websiteActionText);
+     const actionRows = websiteActions.length ? [primaryActions, websiteActions] : [primaryActions];
+     const actionBlockHeight =
+          (actionRows.length * tallestButtonHeight) +
+          (actionRowGap * Math.max(0, actionRows.length - 1));
 
      const titleBlockHeight =
           titleFontSize +
@@ -1963,7 +1971,7 @@ function drawSharedActionScreen(
      const totalTitleBlockHeight =
           titleBlockHeight +
           titleMenuGap +
-          tallestButtonHeight +
+          actionBlockHeight +
           instructionGap +
           (resolvedInstructionLines.length * instructionLineHeight);
 
@@ -2017,56 +2025,62 @@ function drawSharedActionScreen(
 
      resetActionButtonBounds(actionUi, primaryButtonKey);
 
-     const actionY =
+     const firstActionY =
           stackTopY +
           titleBlockHeight +
           titleMenuGap +
           (tallestButtonHeight / 2);
 
-     const totalActionWidth =
-          measuredActions.reduce((sum, item) => sum + item.textWidth + (buttonStyle.buttonExteriorPadding * 2), 0) +
-          (actionGap * Math.max(0, measuredActions.length - 1));
+     actionRows.forEach((rowActions, rowIndex) => {
+          const actionY = firstActionY + (rowIndex * (tallestButtonHeight + actionRowGap));
+          const totalActionWidth =
+               rowActions.reduce((sum, item) => sum + item.textWidth + (buttonStyle.buttonExteriorPadding * 2), 0) +
+               (actionGap * Math.max(0, rowActions.length - 1));
+          let currentX = (miniGameWidth - totalActionWidth) / 2;
 
-     let currentX = (miniGameWidth - totalActionWidth) / 2;
+          rowActions.forEach((item) => {
+               const buttonWidth = item.textWidth + (buttonStyle.buttonExteriorPadding * 2);
+               const buttonHeight = tallestButtonHeight;
+               const buttonX = currentX;
+               const buttonY = actionY - (buttonHeight / 2);
+               const buttonSelectionIndex = selectionMap[item.text];
+               const isFocused = buttonSelectionIndex === selectionIndex;
 
-     measuredActions.forEach((item) => {
-          const buttonWidth = item.textWidth + (buttonStyle.buttonExteriorPadding * 2);
-          const buttonHeight = tallestButtonHeight;
-          const buttonX = currentX;
-          const buttonY = actionY - (buttonHeight / 2);
-          const buttonSelectionIndex = selectionMap[item.text];
-          const isFocused = buttonSelectionIndex === selectionIndex;
+               drawUnifiedTextButton(
+                    { x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight },
+                    item.text,
+                    theme,
+                    isFocused,
+                    400,
+                    buttonStyle.fontSize
+               );
 
-          drawUnifiedTextButton(
-               { x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight },
-               item.text,
-               theme,
-               isFocused,
-               400,
-               buttonStyle.fontSize
-          );
+               if (buttonSelectionIndex === 0) {
+                    setButtonBounds(actionUi[primaryButtonKey], buttonX, buttonY, buttonWidth, buttonHeight);
+               }
 
-          if (buttonSelectionIndex === 0) {
-               setButtonBounds(actionUi[primaryButtonKey], buttonX, buttonY, buttonWidth, buttonHeight);
-          }
+               if (item.text === "TIPS") {
+                    setButtonBounds(actionUi.tipsButton, buttonX, buttonY, buttonWidth, buttonHeight);
+               }
 
-          if (item.text === "TIPS") {
-               setButtonBounds(actionUi.tipsButton, buttonX, buttonY, buttonWidth, buttonHeight);
-          }
+               if (item.text === "OPTIONS") {
+                    setButtonBounds(actionUi.menuButton, buttonX, buttonY, buttonWidth, buttonHeight);
+               }
 
-          if (item.text === "OPTIONS") {
-               setButtonBounds(actionUi.menuButton, buttonX, buttonY, buttonWidth, buttonHeight);
-          }
+               if (item.text === websiteActionText) {
+                    setButtonBounds(actionUi.returnButton, buttonX, buttonY, buttonWidth, buttonHeight);
+               }
 
-          if (item.text === "RETURN") {
-               setButtonBounds(actionUi.returnButton, buttonX, buttonY, buttonWidth, buttonHeight);
-          }
-
-          currentX += buttonWidth + actionGap;
+               currentX += buttonWidth + actionGap;
+          });
      });
 
      if (resolvedInstructionLines.length) {
-          const instructionY = actionY + (tallestButtonHeight / 2) + instructionGap + (buttonStyle.fontSize / 2);
+          const actionBlockBottom = firstActionY - (tallestButtonHeight / 2) + actionBlockHeight;
+          const instructionY =
+               actionBlockBottom +
+               instructionGap +
+               (buttonStyle.fontSize / 2);
 
           resolvedInstructionLines.forEach((line, lineIndex) => {
                drawGlowingCanvasText(
@@ -2112,7 +2126,7 @@ function drawGameWelcomeOverlay(theme) {
                "NEW GAME": 0,
                "TIPS": 1,
                "OPTIONS": 2,
-               "RETURN": 3
+               "DEVELOPER WEBSITE": 3
           },
           alpha,
           !isWelcomeScreen,
@@ -2137,7 +2151,7 @@ function drawPausedOverlay(theme) {
                "RESUME": 0,
                "TIPS": 1,
                "OPTIONS": 2,
-               "RETURN": 3
+               "DEVELOPER WEBSITE": 3
           },
           1,
           true

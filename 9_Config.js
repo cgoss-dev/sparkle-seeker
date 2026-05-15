@@ -166,7 +166,7 @@ export function getCanvasTheme() {
                letterSpacing: 0.25,
                stackGap: 10,
                color: titleColor,
-               rainbow: true,
+               rainbow: false,
                glow: false
           },
 
@@ -175,7 +175,7 @@ export function getCanvasTheme() {
                fontSize: uiFontMd,
                letterSpacing: 0.25,
                color: titleColor,
-               rainbow: true,
+               rainbow: false,
                glow: false
           },
 

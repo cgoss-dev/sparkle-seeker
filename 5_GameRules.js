@@ -83,8 +83,8 @@ const levelRules = Array.from({ length: maxLevelProgressUnits }, (_, index) => {
 // ====================================================================================================
 
 const welcomeTitleLines = ["SPARKLE", "SEEKER"];
-const screenActionTexts = ["NEW GAME", "TIPS", "OPTIONS", "RETURN"];
-const pausedActionTexts = ["RESUME", "TIPS", "OPTIONS", "RETURN"];
+const screenActionTexts = ["NEW GAME", "TIPS", "OPTIONS", "DEVELOPER WEBSITE"];
+const pausedActionTexts = ["RESUME", "TIPS", "OPTIONS", "DEVELOPER WEBSITE"];
 const welcomeInstructionLines = [
      "Collect white sparkles.",
      "Avoid hazards. Reach 1000 to win."
