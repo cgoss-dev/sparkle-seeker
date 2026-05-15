@@ -229,25 +229,18 @@ function getPastelParticleColor(colorIndex = 0) {
      return getCssColor(variableName, "#f5c2e7");
 }
 
-function getHighContrastEnemyColor(colorIndex = 0) {
-     const colors = ["#0ff", "#f0f", "#ff0"];
-     const normalizedIndex = Math.abs(Math.round(Number(colorIndex) || 0)) % colors.length;
-
-     return colors[normalizedIndex];
-}
-
 export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex = 0) {
      if (colorLevel !== 3 && colorRole === "sparkle") {
           return getCssColor("--color-white", "#fff");
      }
 
      if (colorLevel === 0) {
-          if (colorRole === "hazard") {
-               return getHighContrastEnemyColor(colorIndex);
+          if (colorRole === "hazard" || colorRole === "harmfulEffect") {
+               return getCssColor("--tertiary-03", "#f80");
           }
 
-          if (colorRole === "effect") {
-               return getHighContrastEnemyColor(colorIndex);
+          if (colorRole === "effect" || colorRole === "helpfulEffect") {
+               return getCssColor("--tertiary-08", "#08f");
           }
 
           if (colorRole === "trail") {
@@ -931,7 +924,7 @@ function createEffectPickup(type, category) {
           particle: type.particle,
           type,
           category,
-          colorRole: "effect",
+          colorRole: category === "helpful" ? "helpfulEffect" : "harmfulEffect",
           colorIndex: getNextPastelColorIndex(),
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
@@ -992,7 +985,7 @@ export function updateEffectPickups() {
 }
 
 function collectHelpfulEffect(pickup, index) {
-     createCollisionBurst(pickup.x, pickup.y, pickup.color, "sparkle", "effect");
+     createCollisionBurst(pickup.x, pickup.y, pickup.color, "sparkle", "helpfulEffect");
      effectPickups.splice(index, 1);
 
      applyHelpfulEffect(pickup.type);
@@ -1002,7 +995,7 @@ function collectHelpfulEffect(pickup, index) {
 }
 
 function collectHarmfulEffect(pickup, index) {
-     createCollisionBurst(pickup.x, pickup.y, pickup.color, "harmful", "effect");
+     createCollisionBurst(pickup.x, pickup.y, pickup.color, "harmful", "harmfulEffect");
      effectPickups.splice(index, 1);
 
      applyHarmfulEffect(pickup.type);

@@ -184,7 +184,7 @@ export function getMovementOptionLines() {
 
 export function getColorOptionLines() {
      return [
-          "High Contrast: white sparkles; hazards and effects use cyan, magenta, and yellow.",
+          "High Contrast: white sparkles, orange hazards, and blue friendlies.",
           "Vibrant: white sparkles; hazards and effects use rainbow colors.",
           "Pastel: white sparkles; hazards and effects use soft Catppuccin Mocha colors.",
           "Black & White: monochrome accessibility board."
