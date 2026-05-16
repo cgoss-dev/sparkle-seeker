@@ -1049,9 +1049,8 @@ export function drawOptionStepper(
      const { colors } = theme;
      const optionsStyle = getTextStyle(theme, "buttonsOptions");
      const centerY = row.y + (row.height / 2);
-     const lineGap = optionsStyle.fontSize * 1.5;
-     const titleY = centerY - (lineGap / 2);
-     const valueY = centerY + (lineGap / 2);
+     const titleY = row.y + (row.height * 0.25);
+     const valueY = row.y + (row.height * 0.75);
      const canDecrease = levelIndex > 0;
      const canIncrease = levelIndex < maxLevelIndex;
      const optionTextColor = optionsStyle.color || colors.controlText;
@@ -1864,7 +1863,7 @@ function drawMenuDetailLines(theme, lines, startY, options = {}) {
      miniGameCtx.shadowBlur = 0;
      miniGameCtx.font = getTextFont(theme, "buttonsOptions", 400);
 
-     function drawCenteredDetailLine(line, firstSegment, bodyText) {
+     function measureDetailLine(firstSegment, bodyText) {
           const hasLeadingIcon = firstSegment?.type === "icon";
           const textFont = getTextFont(theme, "buttonsOptions", 400);
           let icon = null;
@@ -1884,8 +1883,57 @@ function drawMenuDetailLines(theme, lines, startY, options = {}) {
                }
           }
 
-          const totalWidth = iconWidth + (icon ? iconGap : 0) + textWidth;
-          let currentX = (miniGameWidth - totalWidth) / 2;
+          return iconWidth + (icon ? iconGap : 0) + textWidth;
+     }
+
+     function getCenteredBodyBlockX() {
+          if (!shouldCenterContent) {
+               return 0;
+          }
+
+          let maxBodyLineWidth = 0;
+
+          lines.forEach((line) => {
+               if (!line.trim() || sectionHeadings.has(line)) {
+                    return;
+               }
+
+               const richSegments = parseRichTextSegments(line);
+               const firstSegment = richSegments[0];
+               const hasLeadingIcon = firstSegment?.type === "icon";
+               const bodyText = hasLeadingIcon
+                    ? richSegments
+                         .slice(1)
+                         .map((segment) => segment.value)
+                         .join("")
+                         .trimStart()
+                    : line;
+
+               maxBodyLineWidth = Math.max(maxBodyLineWidth, measureDetailLine(firstSegment, bodyText));
+          });
+
+          return (miniGameWidth - maxBodyLineWidth) / 2;
+     }
+
+     const centeredBodyBlockX = getCenteredBodyBlockX();
+
+     function drawCenteredDetailLine(line, firstSegment, bodyText) {
+          const hasLeadingIcon = firstSegment?.type === "icon";
+          const textFont = getTextFont(theme, "buttonsOptions", 400);
+          let icon = null;
+          let iconFont = textFont;
+          let iconWidth = 0;
+          const iconGap = hasLeadingIcon ? fontSize * 0.45 : 0;
+          let currentX = centeredBodyBlockX;
+
+          if (hasLeadingIcon) {
+               icon = getRichTextIcon(theme, firstSegment.value);
+
+               if (icon) {
+                    iconFont = getTextFont(theme, "buttonsOptions", 400, "body", getRichTextIconSize(icon, fontSize));
+                    iconWidth = getRichTextIconWidth(miniGameCtx, icon, fontSize, iconFont);
+               }
+          }
 
           if (icon) {
                const iconX = currentX + (icon.xOffset || 0);

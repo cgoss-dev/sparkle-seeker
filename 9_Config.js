@@ -161,7 +161,7 @@ export function getCanvasTheme() {
           canvasSpacing: {
                uiPadding: uiFontSm,
                uiRowGap: uiFontSm,
-               circleTitleGap: uiFontSm,
+               circleTitleGap: uiFontSm * 1.5,
                menuPadding: uiFontMd,
                betweenButtons: uiFontSm,
                bodyLineHeight: uiFontSm * 1.5,
@@ -227,7 +227,7 @@ export function getCanvasTheme() {
 
           scoreReady: {
                font: "body",
-               fontSize: uiFontSm,
+               fontSize: uiFontMd,
                letterSpacing: 0,
                color: bodyColor,
                rainbow: false,
