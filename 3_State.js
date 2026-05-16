@@ -179,6 +179,7 @@ export const screenActionUi = {
 
 export const pausedActionUi = {
      resumeButton: { x: 0, y: 0, width: 0, height: 0 },
+     newGameButton: { x: 0, y: 0, width: 0, height: 0 },
      tipsButton: { x: 0, y: 0, width: 0, height: 0 },
      menuButton: { x: 0, y: 0, width: 0, height: 0 },
      returnButton: { x: 0, y: 0, width: 0, height: 0 }
@@ -205,6 +206,19 @@ export const gameMenuScroll = {
 export const menuKeyboardFocus = {
      timer: 0,
      duration: 60
+};
+
+export const meterPulse = {
+     level: {
+          timer: 0,
+          duration: 18,
+          scale: 1.1
+     },
+     health: {
+          timer: 0,
+          duration: 18,
+          scale: 1.1
+     }
 };
 
 // ==================================================
@@ -369,11 +383,23 @@ export function addStarScore(value) {
 }
 
 export function setPlayerHealth(value) {
-     playerHealth = Math.max(0, Math.min(maxPlayerHealth, value));
+     const nextHealth = Math.max(0, Math.min(maxPlayerHealth, value));
+
+     if (nextHealth !== playerHealth) {
+          triggerHealthMeterPulse();
+     }
+
+     playerHealth = nextHealth;
 }
 
 export function addPlayerHealth(value) {
-     playerHealth = Math.max(0, Math.min(maxPlayerHealth, playerHealth + value));
+     const nextHealth = Math.max(0, Math.min(maxPlayerHealth, playerHealth + value));
+
+     if (nextHealth !== playerHealth) {
+          triggerHealthMeterPulse();
+     }
+
+     playerHealth = nextHealth;
 }
 
 // ==================================================
@@ -586,6 +612,45 @@ export function getMenuKeyboardFocusAlpha() {
      return Math.max(0, Math.min(1, menuKeyboardFocus.timer / menuKeyboardFocus.duration));
 }
 
+function triggerMeterPulse(pulse) {
+     pulse.timer = pulse.duration;
+}
+
+function getMeterPulseScale(pulse) {
+     if (pulse.timer <= 0 || pulse.duration <= 0) {
+          return 1;
+     }
+
+     const progress = 1 - (pulse.timer / pulse.duration);
+     const pulseWave = 1 - Math.abs((progress * 2) - 1);
+
+     return 1 + ((pulse.scale - 1) * pulseWave);
+}
+
+export function triggerLevelMeterPulse() {
+     triggerMeterPulse(meterPulse.level);
+}
+
+export function triggerHealthMeterPulse() {
+     triggerMeterPulse(meterPulse.health);
+}
+
+export function updateMeterPulseTimers() {
+     Object.values(meterPulse).forEach((pulse) => {
+          if (pulse.timer > 0) {
+               pulse.timer -= 1;
+          }
+     });
+}
+
+export function getLevelMeterPulseScale() {
+     return getMeterPulseScale(meterPulse.level);
+}
+
+export function getHealthMeterPulseScale() {
+     return getMeterPulseScale(meterPulse.health);
+}
+
 // Boolean setters. Keep legacy simple on/off controls in sync with option levels.
 export function setMusicEnabled(value) {
      musicEnabled = value;
@@ -718,6 +783,11 @@ export function resetUiActionBounds() {
      pausedActionUi.resumeButton.width = 0;
      pausedActionUi.resumeButton.height = 0;
 
+     pausedActionUi.newGameButton.x = 0;
+     pausedActionUi.newGameButton.y = 0;
+     pausedActionUi.newGameButton.width = 0;
+     pausedActionUi.newGameButton.height = 0;
+
      pausedActionUi.tipsButton.x = 0;
      pausedActionUi.tipsButton.y = 0;
      pausedActionUi.tipsButton.width = 0;
@@ -739,6 +809,13 @@ export function resetActionButtonBounds(actionUi, primaryButtonKey) {
      actionUi[primaryButtonKey].y = 0;
      actionUi[primaryButtonKey].width = 0;
      actionUi[primaryButtonKey].height = 0;
+
+     if (actionUi.newGameButton) {
+          actionUi.newGameButton.x = 0;
+          actionUi.newGameButton.y = 0;
+          actionUi.newGameButton.width = 0;
+          actionUi.newGameButton.height = 0;
+     }
 
      actionUi.tipsButton.x = 0;
      actionUi.tipsButton.y = 0;

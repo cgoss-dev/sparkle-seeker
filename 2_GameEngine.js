@@ -61,6 +61,8 @@ import {
      setColorLevel,
      setMiniGameSize,
      updateMenuKeyboardFocusTimer,
+     updateMeterPulseTimers,
+     triggerLevelMeterPulse,
 
      resetUiActionBounds,
      resetGameState
@@ -490,7 +492,7 @@ function showLevelPopup(levelNumber) {
      const introIcon = getLevelIntroIcon(levelNumber);
 
      levelPopupText = introText
-          ? `LEVEL ${levelNumber}: ${introText}`
+          ? introText
           : `LEVEL ${levelNumber}`;
      levelPopupSubtext = introDescription;
      levelPopupIcon = introIcon;
@@ -522,6 +524,7 @@ function syncLevelProgressState() {
      }
 
      activeLevelNumber = currentLevelNumber;
+     triggerLevelMeterPulse();
      showLevelPopup(currentLevelNumber);
 }
 
@@ -599,6 +602,7 @@ export function updateGame() {
      updateGameOverlayTimer();
      updateLevelPopupTimer();
      updateMenuKeyboardFocusTimer();
+     updateMeterPulseTimers();
 
      if (screenLayerActive) {
           updateScreenTitleColorState();

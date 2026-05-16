@@ -126,14 +126,29 @@ export const fallingObjectSpeedMax = 1;
 const spawnDensityBaselineArea = 960 * 640;
 const spawnDensityMinScale = 0.45;
 const spawnDensityMaxScale = 1;
+const fallSpeedMinScale = 0.7;
+const fallSpeedMaxScale = 1;
+const fallingObjectSpeedStep = 0.25;
 
-// Boosts and banes are spawned as a ratio of successful star spawns:
-export const boostBaneSpawnRatios = [
+export const boostBaneBaseSpawnStarsByLevel = [
+     Infinity,
+     48,
+     40,
+     32,
+     28,
+     24,
+     20,
+     16,
+     12,
+     10
+];
+
+export const boostBaneDifficultyMultipliers = [
      0,
-     1 / 32,
-     1 / 24,
-     1 / 16,
-     1 / 8
+     0.5,
+     1,
+     1.5,
+     2
 ];
 
 const boostBaneTypes = Object.values(starShowerBoostBaneIcons);
@@ -167,6 +182,27 @@ function getSpawnDensityScale() {
      return clampSpawnDensityScale((miniGameWidth * miniGameHeight) / spawnDensityBaselineArea);
 }
 
+function clampFallSpeedScale(value) {
+     return Math.max(fallSpeedMinScale, Math.min(fallSpeedMaxScale, value));
+}
+
+function getFallSpeedScale() {
+     if (miniGameWidth <= 0 || miniGameHeight <= 0) {
+          return fallSpeedMaxScale;
+     }
+
+     const areaRatio = (miniGameWidth * miniGameHeight) / spawnDensityBaselineArea;
+
+     return clampFallSpeedScale(Math.sqrt(areaRatio));
+}
+
+function roundToFallSpeedStep(value) {
+     return Math.max(
+          fallingObjectSpeedStep,
+          Math.round(value / fallingObjectSpeedStep) * fallingObjectSpeedStep
+     );
+}
+
 function getScaledStarSpawnDelay() {
      return starSpawnDelay / getSpawnDensityScale();
 }
@@ -184,7 +220,26 @@ function getScaledBoostBanePickupCap() {
 }
 
 function getFallingObjectSpeed() {
-     return randomNumber(fallingObjectSpeedMin, fallingObjectSpeedMax);
+     const speedScale = getFallSpeedScale();
+     const speedMin = roundToFallSpeedStep(fallingObjectSpeedMin * speedScale);
+     const speedMax = Math.max(
+          speedMin,
+          roundToFallSpeedStep(fallingObjectSpeedMax * speedScale)
+     );
+
+     return randomNumber(speedMin, speedMax);
+}
+
+function getBoostBaneSpawnChance() {
+     const levelIndex = Math.max(0, getCurrentLevelNumber() - 1);
+     const starsPerBoostBane = boostBaneBaseSpawnStarsByLevel[levelIndex] ?? boostBaneBaseSpawnStarsByLevel.at(-1);
+     const difficultyMultiplier = boostBaneDifficultyMultipliers[baneLevel] ?? 0;
+
+     if (!Number.isFinite(starsPerBoostBane) || starsPerBoostBane <= 0 || difficultyMultiplier <= 0) {
+          return 0;
+     }
+
+     return difficultyMultiplier / starsPerBoostBane;
 }
 
 // ====================================================================================================
@@ -993,7 +1048,7 @@ export function createBanePickup() {
 }
 
 export function maybeCreateBoostBanePickupsFromStarSpawn() {
-     const boostBaneSpawnChance = boostBaneSpawnRatios[baneLevel] ?? 0;
+     const boostBaneSpawnChance = getBoostBaneSpawnChance();
 
      if (boostBanePickups.length >= getScaledBoostBanePickupCap()) {
           return;

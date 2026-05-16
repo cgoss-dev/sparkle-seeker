@@ -31,24 +31,29 @@ import {
 
 // ====================================================================================================
 // NOTE: LEVELS
-// `scoreMin` is inclusive. Ten levels cover scores 0-999; 1000+ wins.
+// `scoreMin` is inclusive. Level 10 starts at the win threshold.
 // ====================================================================================================
 
-export const winScore = 1000;
+export const winScore = 1500;
 export const startOverlayDuration = 120;
 export const overlayFadeFrames = 30;
-export const levelPopupDuration = 300;
+export const levelPopupDuration = 600;
 export const maxLevelProgressUnits = 10;
 export const progressUnitsPerCircle = 2;
+const levelScoreMins = [
+     0,
+     25,
+     75,
+     150,
+     250,
+     400,
+     600,
+     850,
+     1150,
+     1500
+];
 
 const levelChallengeProgression = [
-     {
-          introText: "",
-          introDescription: "",
-          introIcon: "",
-          strikesUnlocked: true,
-          baneNames: []
-     },
      {
           introText: "",
           introDescription: "",
@@ -85,7 +90,7 @@ const levelRules = Array.from({ length: maxLevelProgressUnits }, (_, index) => {
 
      return {
           levelNumber: index + 1,
-          scoreMin: index * 100,
+          scoreMin: levelScoreMins[index] ?? index * 100,
           introText: index < levelChallengeProgression.length ? progression.introText : "",
           introDescription: index < levelChallengeProgression.length ? progression.introDescription : "",
           introIcon: index < levelChallengeProgression.length ? progression.introIcon : "",
@@ -100,9 +105,10 @@ const levelRules = Array.from({ length: maxLevelProgressUnits }, (_, index) => {
 
 const welcomeTitleLines = ["STAR", "SHOWER"];
 const screenActionTexts = ["NEW GAME", "TIPS", "OPTIONS", "DEVELOPER"];
-const pausedActionTexts = ["RESUME", "TIPS", "OPTIONS", "DEVELOPER"];
+const pausedActionTexts = ["RESUME", "NEW GAME", "TIPS", "OPTIONS", "DEVELOPER"];
 const welcomeInstructionLines = [
-     "Collect stars, avoid strikes. Use pointer or arrows to navigate."
+     "Collect stars, avoid strikes.",
+     "To navigate, use pointer or arrows."
 ];
 
 export function getWelcomeTitleLines() {
@@ -114,7 +120,7 @@ export function getWelcomeInstructionLines() {
 }
 
 export function getWinGoalText() {
-     return `Reach ${winScore}+ to win.`;
+     return "Reach level 10 to win.";
 }
 
 export function getWinTitleLines() {
@@ -151,9 +157,9 @@ export function getCurrentPausedActionTexts() {
 
 export function getHowToPlayLines() {
      return [
-          "{iconStar} Stars level.",
-          "{iconStrike} Strikes deal damage.",
-          getWinGoalText()
+          getWinGoalText(),
+          "{iconStar} Stars: gain points.",
+          "{iconStrike} Strikes: deal damage."
      ];
 }
 
@@ -176,10 +182,10 @@ export function getBaneLines() {
 export function getDifficultyOptionLines() {
      return [
           "OFF: stars and strikes.",
-          "MIN: adds boosts and banes.",
-          "LOW: 1 per 24 stars.",
-          "MED: 1 per 16 stars.",
-          "MAX: 1 per 8 stars."
+          "MIN: boosts and banes 0.5x.",
+          "LOW: boosts and banes 1x.",
+          "MED: boosts and banes 1.5x.",
+          "MAX: boosts and banes 2x."
      ];
 }
 
@@ -236,9 +242,13 @@ export function getCurrentLevelData() {
 
 export function getCurrentLevelMeterUnits() {
      const currentLevelData = getCurrentLevelData();
+     const nextLevelData = levelRules[currentLevelData.levelNumber] || null;
      const pointsIntoLevel = starScore - currentLevelData.scoreMin;
      const completedLevels = currentLevelData.levelNumber - 1;
-     const halfwayToNextLevel = pointsIntoLevel >= 50 ? 1 : 0;
+     const currentLevelRange = nextLevelData
+          ? nextLevelData.scoreMin - currentLevelData.scoreMin
+          : winScore - currentLevelData.scoreMin;
+     const halfwayToNextLevel = currentLevelRange > 0 && pointsIntoLevel >= currentLevelRange / 2 ? 1 : 0;
 
      return Math.min(maxLevelProgressUnits, completedLevels + halfwayToNextLevel);
 }

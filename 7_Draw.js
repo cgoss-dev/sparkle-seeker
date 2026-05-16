@@ -64,7 +64,9 @@ import {
      setButtonBounds,
      setGameMenuScrollMax,
      isPointInsideRect,
-     resetActionButtonBounds
+     resetActionButtonBounds,
+     getLevelMeterPulseScale,
+     getHealthMeterPulseScale
 } from "./3_State.js";
 
 import {
@@ -585,41 +587,48 @@ export function drawPanelBox(x, y, width, height, theme, lineWidth = null, fillS
      const resolvedLineWidth = lineWidth ?? sizes.borderWidth;
      const outerWidth = sizes.borderWidthFocus || sizes.borderWidth || 1;
      const insetWidth = sizes.panelBorderWidth || outerWidth;
+     const cornerRadius = getControlCornerRadius(theme, width, height);
 
      miniGameCtx.shadowBlur = 0;
-     miniGameCtx.fillStyle = colors.fontColor;
-     miniGameCtx.fillRect(x, y - outerWidth, width, outerWidth);
-     miniGameCtx.fillRect(x, y + height, width, outerWidth);
-     miniGameCtx.fillRect(x - outerWidth, y, outerWidth, height);
-     miniGameCtx.fillRect(x + width, y, outerWidth, height);
-
      miniGameCtx.fillStyle = fillStyle || colors.menuPanelFill;
-     miniGameCtx.fillRect(x, y, width, height);
+     drawRoundedRect(x, y, width, height, cornerRadius);
+     miniGameCtx.fill();
 
-     miniGameCtx.lineJoin = "miter";
-     miniGameCtx.lineCap = "butt";
+     miniGameCtx.lineJoin = "round";
+     miniGameCtx.lineCap = "round";
 
      miniGameCtx.strokeStyle = colors.fontColor;
      miniGameCtx.lineWidth = outerWidth;
-     miniGameCtx.strokeRect(x, y, width, height);
+     drawRoundedRect(
+          x + (outerWidth / 2),
+          y + (outerWidth / 2),
+          width - outerWidth,
+          height - outerWidth,
+          Math.max(0, cornerRadius - (outerWidth / 2))
+     );
+     miniGameCtx.stroke();
 
      miniGameCtx.strokeStyle = colors.frameInset;
      miniGameCtx.lineWidth = insetWidth;
-     miniGameCtx.strokeRect(
-          x + (insetWidth / 2),
-          y + (insetWidth / 2),
-          width - insetWidth,
-          height - insetWidth
+     drawRoundedRect(
+          x + insetWidth,
+          y + insetWidth,
+          width - (insetWidth * 2),
+          height - (insetWidth * 2),
+          Math.max(0, cornerRadius - insetWidth)
      );
+     miniGameCtx.stroke();
 
      miniGameCtx.strokeStyle = colors.outlineStrong;
      miniGameCtx.lineWidth = resolvedLineWidth;
-     miniGameCtx.strokeRect(
+     drawRoundedRect(
           x + (resolvedLineWidth / 2),
           y + (resolvedLineWidth / 2),
           width - resolvedLineWidth,
-          height - resolvedLineWidth
+          height - resolvedLineWidth,
+          Math.max(0, cornerRadius - (resolvedLineWidth / 2))
      );
+     miniGameCtx.stroke();
 }
 
 function getTrailGlowBlur() {
@@ -1493,12 +1502,18 @@ export function drawScore(theme) {
      const meterY = levelY + levelStatusStyle.fontSize + canvasSpacing.circleTitleGap - circleInkMetrics.top;
      let currentX = leftEdgeX + circleInkMetrics.left;
 
+     miniGameCtx.save();
+     miniGameCtx.translate(leftEdgeX, meterY);
+     miniGameCtx.scale(getLevelMeterPulseScale(), getLevelMeterPulseScale());
+
      for (let i = 0; i < circleSlots; i += 1) {
           const slotUnits = Math.max(0, Math.min(progressUnitsPerCircle, levelMeterUnits - (i * progressUnitsPerCircle)));
 
-          miniGameCtx.fillText(getCircleMeterGlyph(circleMeterStyle, slotUnits), currentX, meterY);
+          miniGameCtx.fillText(getCircleMeterGlyph(circleMeterStyle, slotUnits), currentX - leftEdgeX, 0);
           currentX += circleAdvance;
      }
+
+     miniGameCtx.restore();
 
      const starY = meterY + circleInkMetrics.bottom + canvasSpacing.uiRowGap;
      const scoreIconX = leftEdgeX + scoreIconStyle.xOffset;
@@ -1588,12 +1603,18 @@ export function drawHealth(theme) {
      const meterY = statusTitleY + levelStatusStyle.fontSize + canvasSpacing.circleTitleGap - circleInkMetrics.top;
      let currentX = rightEdgeX - circleInkMetrics.right;
 
+     miniGameCtx.save();
+     miniGameCtx.translate(rightEdgeX, meterY);
+     miniGameCtx.scale(getHealthMeterPulseScale(), getHealthMeterPulseScale());
+
      for (let i = 0; i < circleSlots; i += 1) {
           const slotUnits = Math.max(0, Math.min(progressUnitsPerCircle, healthUnits - (i * progressUnitsPerCircle)));
 
-          miniGameCtx.fillText(getCircleMeterGlyph(circleMeterStyle, slotUnits), currentX, meterY);
+          miniGameCtx.fillText(getCircleMeterGlyph(circleMeterStyle, slotUnits), currentX - rightEdgeX, 0);
           currentX -= circleAdvance;
      }
+
+     miniGameCtx.restore();
 
      const statusDetailY = meterY + circleInkMetrics.bottom + canvasSpacing.uiRowGap;
 
@@ -2409,6 +2430,10 @@ function drawSharedActionScreen(
                     setButtonBounds(actionUi[primaryButtonKey], buttonX, buttonY, buttonWidth, buttonHeight);
                }
 
+               if (item.text === "NEW GAME" && actionUi.newGameButton) {
+                    setButtonBounds(actionUi.newGameButton, buttonX, buttonY, buttonWidth, buttonHeight);
+               }
+
                if (item.text === "TIPS") {
                     setButtonBounds(actionUi.tipsButton, buttonX, buttonY, buttonWidth, buttonHeight);
                }
@@ -2476,9 +2501,10 @@ function drawPausedOverlay(theme) {
           "resumeButton",
           {
                "RESUME": 0,
-               "TIPS": 1,
-               "OPTIONS": 2,
-               "DEVELOPER": 3
+               "NEW GAME": 1,
+               "TIPS": 2,
+               "OPTIONS": 3,
+               "DEVELOPER": 4
           },
           1,
           true
@@ -2644,18 +2670,17 @@ function drawLevelPopup(theme) {
           }
      }
 
-     drawStyledCanvasText(
+     drawGlowingCanvasText(
           miniGameCtx,
           popupText,
           titleStartX + titleIconSize + titleIconGap,
           titleY,
-          "title",
+          titleStyle.color || colors.fontColor,
+          getTextFont(theme, "title", 400),
+          "left",
+          "middle",
           theme,
-          {
-               color: titleStyle.color || colors.fontColor,
-               align: "left",
-               baseline: "middle"
-          }
+          titleStyle.glow
      );
 
      if (popupSubtext) {

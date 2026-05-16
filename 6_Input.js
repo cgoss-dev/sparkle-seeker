@@ -435,20 +435,26 @@ function handlePausedOverlayPointerDown(x, y) {
           return true;
      }
 
-     if (isPointInsideBox(x, y, pausedActionUi.tipsButton)) {
+     if (isPointInsideBox(x, y, pausedActionUi.newGameButton)) {
           setPausedSelectionIndex(1);
+          startNewGameRound();
+          return true;
+     }
+
+     if (isPointInsideBox(x, y, pausedActionUi.tipsButton)) {
+          setPausedSelectionIndex(2);
           dismissPausedToTipsMenu();
           return true;
      }
 
      if (isPointInsideBox(x, y, pausedActionUi.menuButton)) {
-          setPausedSelectionIndex(2);
+          setPausedSelectionIndex(3);
           dismissPausedToOptionsMenu();
           return true;
      }
 
      if (isPointInsideBox(x, y, pausedActionUi.returnButton)) {
-          setPausedSelectionIndex(3);
+          setPausedSelectionIndex(4);
           returnToWebsite();
           return true;
      }
@@ -847,14 +853,18 @@ function activatePausedSelection() {
      }
 
      if (pausedSelectionIndex === 1) {
-          dismissPausedToTipsMenu();
+          startNewGameRound();
      }
 
      if (pausedSelectionIndex === 2) {
-          dismissPausedToOptionsMenu();
+          dismissPausedToTipsMenu();
      }
 
      if (pausedSelectionIndex === 3) {
+          dismissPausedToOptionsMenu();
+     }
+
+     if (pausedSelectionIndex === 4) {
           returnToWebsite();
      }
 }
@@ -985,14 +995,14 @@ function handlePausedNavigation(event) {
      if (isPreviousMenuKey(event)) {
           event.preventDefault();
           showMenuKeyboardFocusForDirectionalArrow(event);
-          setPausedSelectionIndex(clamp(pausedSelectionIndex - 1, 0, 3));
+          setPausedSelectionIndex(clamp(pausedSelectionIndex - 1, 0, 4));
           return true;
      }
 
      if (isNextMenuKey(event)) {
           event.preventDefault();
           showMenuKeyboardFocusForDirectionalArrow(event);
-          setPausedSelectionIndex(clamp(pausedSelectionIndex + 1, 0, 3));
+          setPausedSelectionIndex(clamp(pausedSelectionIndex + 1, 0, 4));
           return true;
      }
 
