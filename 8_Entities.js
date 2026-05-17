@@ -82,6 +82,7 @@ import {
 
 import {
      starShowerBoostblightIcons,
+     starShowerGuideIcons,
      starShowerRainbowPalette,
      getCssColor
 } from "./9_Config.js";
@@ -123,8 +124,9 @@ export const framesPerSecond = 60;
 export const starSpawnDelay = 25;
 export const starSpawnCap = 50;
 export const strikeSpawnRatio = 0.35;
-export const openingStrikeGraceStarSpawns = 3;
-export const boostblightPickupCap = 60;
+export const openingStrikeGraceStarSpawns = 20;
+export const openingBoostblightGraceStarSpawns = 50;
+export const boostblightPickupCap = 12;
 export const collisionBurstParticleCount = 15;
 export const fallingObjectSpeedMin = 0.25;
 export const fallingObjectSpeedMax = 0.75;
@@ -160,6 +162,8 @@ export const boostblightDifficultyMultipliers = [
 const boostblightTypes = Object.values(starShowerBoostblightIcons);
 const pickupAssetImages = {};
 const introducedBoostblightNames = new Set();
+let introducedStrike = false;
+let lastSpawnedBoostblightName = "";
 let boostblightIntroCallback = null;
 
 export const boostTypes = boostblightTypes.filter((type) => type.category === "boost");
@@ -171,6 +175,8 @@ export function setBoostblightIntroCallback(callback) {
 
 export function resetBoostblightIntroState() {
      introducedBoostblightNames.clear();
+     introducedStrike = false;
+     lastSpawnedBoostblightName = "";
 }
 
 function announceNewBoostblightEntity(type) {
@@ -180,6 +186,20 @@ function announceNewBoostblightEntity(type) {
 
      introducedBoostblightNames.add(type.name);
      boostblightIntroCallback(type);
+}
+
+function announceNewStrikeEntity() {
+     if (!boostblightIntroCallback || introducedStrike) {
+          return;
+     }
+
+     introducedStrike = true;
+     boostblightIntroCallback({
+          ...starShowerGuideIcons.iconStrike,
+          category: "strike",
+          iconName: "iconStrike",
+          popupSubtext: "Health damage"
+     });
 }
 
 function getPickupAssetImage(src) {
@@ -951,6 +971,7 @@ function createMatchingStrikeFromStarSpawn() {
      }
 
      createStrike();
+     announceNewStrikeEntity();
 }
 
 export function updateStarSpawns() {
@@ -1067,6 +1088,32 @@ function createBoostblightPickup(type, category) {
      });
 
      announceNewBoostblightEntity(type);
+     lastSpawnedBoostblightName = type.name || "";
+}
+
+function chooseBoostblightType(availableTypes) {
+     if (availableTypes.length <= 1) {
+          return availableTypes[0] || null;
+     }
+
+     const onBoardNames = new Set(boostblightPickups.map((pickup) => pickup.type?.name).filter(Boolean));
+     const notOnBoardTypes = availableTypes.filter((type) => !onBoardNames.has(type.name));
+     const boardFilteredTypes = notOnBoardTypes.length ? notOnBoardTypes : availableTypes;
+     const notLastTypes = boardFilteredTypes.filter((type) => type.name !== lastSpawnedBoostblightName);
+     const finalTypes = notLastTypes.length ? notLastTypes : boardFilteredTypes;
+
+     return randomItem(finalTypes);
+}
+
+function createBoostblightPickupFromTypes(availableTypes, category) {
+     const type = chooseBoostblightType(availableTypes);
+
+     if (!type) {
+          return false;
+     }
+
+     createBoostblightPickup(type, category);
+     return true;
 }
 
 export function createBoostPickup() {
@@ -1077,7 +1124,7 @@ export function createBoostPickup() {
           return false;
      }
 
-     createBoostblightPickup(randomItem(availableBoostblightTypes), "boost");
+     createBoostblightPickupFromTypes(availableBoostblightTypes, "boost");
      return true;
 }
 
@@ -1089,7 +1136,7 @@ export function createblightPickup() {
           return false;
      }
 
-     createBoostblightPickup(randomItem(availableBoostblightTypes), "blight");
+     createBoostblightPickupFromTypes(availableBoostblightTypes, "blight");
      return true;
 }
 
@@ -1106,11 +1153,22 @@ export function maybeCreateBoostblightPickupsFromStarSpawn() {
      const boostblightSpawnInterval = getBoostblightSpawnInterval();
      const nextBoostblightPickupSpawnTimer = boostblightPickupSpawnTimer + 1;
 
+     if (starSpawnCount < openingBoostblightGraceStarSpawns) {
+          setBoostblightPickupSpawnTimer(0);
+          return;
+     }
+
      if (boostblightPickups.length >= getScaledBoostblightPickupCap()) {
           return;
      }
 
      if (!Number.isFinite(boostblightSpawnInterval)) {
+          setBoostblightPickupSpawnTimer(0);
+          return;
+     }
+
+     if (starSpawnCount === openingBoostblightGraceStarSpawns) {
+          createRandomBoostblightPickup();
           setBoostblightPickupSpawnTimer(0);
           return;
      }

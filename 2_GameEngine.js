@@ -124,7 +124,8 @@ import {
 } from "./7_Draw.js";
 
 import {
-     starShowerBoostblightIcons
+     starShowerBoostblightIcons,
+     starShowerGuideIcons
 } from "./9_Config.js";
 
 import {
@@ -495,10 +496,21 @@ function showNewEntityPopup(entityType) {
           return;
      }
 
-     levelPopupText = `NEW ${entityType.category === "blight" ? "blight" : "BOOST"}`;
-     levelPopupSubtext = entityType.label || "";
-     levelPopupIcon = Object.keys(starShowerBoostblightIcons).find(
-          (iconName) => starShowerBoostblightIcons[iconName] === entityType
+     const categoryLabel = entityType.category === "blight"
+          ? "blight"
+          : entityType.category === "strike"
+               ? "strike"
+               : "boost";
+     const popupIcons = {
+          ...starShowerBoostblightIcons,
+          ...starShowerGuideIcons
+     };
+     const popupSubtext = entityType.popupSubtext || `New ${categoryLabel}`;
+
+     levelPopupText = entityType.label || "";
+     levelPopupSubtext = popupSubtext;
+     levelPopupIcon = entityType.iconName || Object.keys(popupIcons).find(
+          (iconName) => popupIcons[iconName] === entityType
      ) || "";
      levelPopupTimer = levelPopupDuration;
      levelPopupDurationFrames = levelPopupDuration;

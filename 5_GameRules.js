@@ -237,8 +237,8 @@ export function getMovementOptionLines() {
 
 export function getColorOptionLines() {
      return [
-          "Bright: white stars; boosts and blights use rainbow colors.",
-          "Pastel: white stars; boosts and blights use soft Catppuccin Mocha colors.",
+          "Bright: white stars; boosts and blights use bright colors.",
+          "Pastel: white stars; boosts and blights use pastel colors.",
           "Monochrome: white, gray, and black."
      ];
 }

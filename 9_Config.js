@@ -61,7 +61,7 @@ export const starShowerBoostblightIcons = {
           assetSrc: "./images/icons/magnet.svg",
           ability: "expandStarPickupRange",
           lastsUntilUsed: false,
-          durationSeconds: 5,
+          durationSeconds: 8,
           xOffset: -3
      },
 
@@ -171,6 +171,9 @@ export function getCanvasTheme() {
                uiPadding: uiFontSm * 0.75,
                uiRowGap: uiFontSm * 0.75,
                circleTitleGap: uiFontSm,
+               hudPadding: uiFontSm * 0.5,
+               hudRowGap: uiFontSm * 0.5,
+               hudTitleGap: uiFontSm * 0.5,
                menuPadding: uiFontMd,
                betweenButtons: uiFontSm,
                bodyLineHeight: uiFontSm * 1.5,
@@ -212,12 +215,21 @@ export function getCanvasTheme() {
                glow: false
           },
 
+          levelPopupTitle: {
+               font: "marquee",
+               fontSize: uiFontSm * 1.5,
+               letterSpacing: 0.25,
+               color: titleColor,
+               rainbow: true,
+               glow: false
+          },
+
           levelStatus: {
                font: "marquee",
                fontSize: uiFontSm * 1.5,
                letterSpacing: 0.25,
                color: "#fff",
-               rainbow: true,
+               rainbow: false,
                glow: false
           },
 
