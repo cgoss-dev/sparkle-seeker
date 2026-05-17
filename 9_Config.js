@@ -169,7 +169,7 @@ export function getCanvasTheme() {
           canvasSpacing: {
                uiPadding: uiFontSm,
                uiRowGap: uiFontSm,
-               circleTitleGap: uiFontSm * 1.25,
+               circleTitleGap: uiFontSm,
                menuPadding: uiFontMd,
                betweenButtons: uiFontSm,
                bodyLineHeight: uiFontMd,
@@ -213,7 +213,7 @@ export function getCanvasTheme() {
 
           levelStatus: {
                font: "marquee",
-               fontSize: uiFontSm * 1.75,
+               fontSize: uiFontSm * 1.5,
                letterSpacing: 0.25,
                color: "#fff",
                rainbow: true,
@@ -221,21 +221,18 @@ export function getCanvasTheme() {
           },
 
           circleMeters: {
-               font: "circleMeter",
-               fontSize: uiFontMd,
-               emptyChar: "\u25CB\uFE0E",
-               halfChar: "\u25D2\uFE0E",
-               fullChar: "\u25CF\uFE0E",
+               fontSize: uiFontSm * 1.5,
+               emptyAssetSrc: "./images/icons/meter-empty.svg",
+               halfAssetSrc: "./images/icons/meter-half.svg",
+               fullAssetSrc: "./images/icons/meter-full.svg",
+               assetScale: 1,
                advanceScale: 0.75,
-               letterSpacing: 0.25,
-               color: bodyColor,
-               rainbow: false,
-               glow: true
+               letterSpacing: 0.25
           },
 
           scoreReady: {
                font: "body",
-               fontSize: uiFontSm * 1.25,
+               fontSize: uiFontSm * 1.5,
                letterSpacing: 0,
                color: bodyColor,
                rainbow: false,
@@ -251,7 +248,7 @@ export function getCanvasTheme() {
                yOffset: -1,
                color: bodyColor,
                rainbow: false,
-               glow: true
+               glow: false
           },
 
           statusIcon: {
@@ -262,7 +259,7 @@ export function getCanvasTheme() {
                yOffset: -1,
                color: bodyColor,
                rainbow: false,
-               glow: true
+               glow: false
           },
 
           buttonsOptions: {
@@ -321,7 +318,6 @@ export function getCanvasTheme() {
           fonts: {
                marquee: getCssString("--font-display", "\"Bungee Shade\", cursive"),
                body: getCssString("--font-body", "\"Noto Sans Mono\", monospace"),
-               circleMeter: "\"Apple Symbols\", \"Segoe UI Symbol\", \"Noto Sans Symbols\", sans-serif",
                symbol: "\"Segoe UI Symbol\", \"Apple Color Emoji\", \"Noto Color Emoji\", sans-serif"
           },
 

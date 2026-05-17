@@ -72,6 +72,7 @@ import {
      areStrikesUnlockedForCurrentLevel,
      progressUnitsPerCircle,
      getCurrentLevelNumber,
+     getUnlockedBoostNamesForCurrentLevel,
      getUnlockedBaneNamesForCurrentLevel
 } from "./5_GameRules.js";
 
@@ -509,15 +510,9 @@ export function triggerPlayerFacePop(scale = 1.1) {
      player.hitScale = Math.max(player.hitScale, scale);
 }
 
-export function getPlayerLevelScale() {
-     return getCurrentLevelNumber() >= 5 ? 1.1 : 1;
-}
-
-export function applyPlayerLevelScale() {
-     const levelScale = getPlayerLevelScale();
-
-     player.size = playerBaseSize * levelScale;
-     player.radius = playerBaseRadius * levelScale;
+export function syncPlayerSize() {
+     player.size = playerBaseSize;
+     player.radius = playerBaseRadius;
      clampPlayerToCanvas();
 }
 
@@ -669,7 +664,7 @@ export function updatePlayer() {
 }
 
 export function updatePlayerFaceState() {
-     applyPlayerLevelScale();
+     syncPlayerSize();
 
      if (gamePaused) {
           player.char = gameWon ? playerFaces.star : playerFaces.neutral;
@@ -1033,7 +1028,14 @@ function createBoostBanePickup(type, category) {
 }
 
 export function createBoostPickup() {
-     createBoostBanePickup(randomItem(boostTypes), "boost");
+     const unlockedBoostNames = getUnlockedBoostNamesForCurrentLevel();
+     const availableBoostBaneTypes = boostTypes.filter((type) => unlockedBoostNames.includes(type.name));
+
+     if (availableBoostBaneTypes.length <= 0) {
+          return;
+     }
+
+     createBoostBanePickup(randomItem(availableBoostBaneTypes), "boost");
 }
 
 export function createBanePickup() {

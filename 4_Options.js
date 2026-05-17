@@ -279,6 +279,7 @@ export function getMenuScreenLayout(theme) {
 
      const sidePadding = spacing.menuPadding;
      const topBotPadding = spacing.menuPadding;
+     const optionStackGap = spacing.uiPadding;
      const titleFontSize = title.fontSize;
 
      const buttonHeight = getUnifiedButtonHeight(
@@ -302,14 +303,14 @@ export function getMenuScreenLayout(theme) {
           menuTopBotPadding: topBotPadding,
           titleFontSize,
           titleGap: topBotPadding,
-          rowGap: spacing.betweenButtons,
+          rowGap: optionStackGap,
           titleCenterX,
           titleY,
           buttonHeight,
           backButtonWidth,
           backButtonX,
           backButtonY,
-          contentTopY: titleY + titleFontSize + topBotPadding,
+          contentTopY: titleY + titleFontSize + optionStackGap,
           contentWidth: miniGameWidth - (sidePadding * 2),
           contentBottomY: miniGameHeight - topBotPadding - buttonHeight - topBotPadding
      };

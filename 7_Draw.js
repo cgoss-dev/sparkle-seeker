@@ -113,8 +113,7 @@ import {
      applyTemporaryPlayerFace,
      triggerPlayerFacePop,
      updatePlayerSpeedFromHealth,
-     applyPlayerLevelScale,
-     getPlayerLevelScale
+     syncPlayerSize
 } from "./8_Entities.js";
 
 import {
@@ -152,6 +151,7 @@ const stepperLeftIcon = new Image();
 stepperLeftIcon.src = "./images/icons/chevron-left.svg";
 const stepperRightIcon = new Image();
 stepperRightIcon.src = "./images/icons/chevron-right.svg";
+const circleMeterAssetImages = {};
 const richTextIconAssetImages = {};
 
 // Re-export moved player/entity helpers so existing imports from this file keep working.
@@ -167,8 +167,7 @@ export {
      applyTemporaryPlayerFace,
      triggerPlayerFacePop,
      updatePlayerSpeedFromHealth,
-     applyPlayerLevelScale,
-     getPlayerLevelScale
+     syncPlayerSize
 };
 
 // ==================================================
@@ -1047,9 +1046,8 @@ export function drawOptionStepper(
      const { colors } = theme;
      const optionsStyle = getTextStyle(theme, "buttonsOptions");
      const centerY = row.y + (row.height / 2);
-     const lineGap = optionsStyle.fontSize * 1.1;
-     const titleY = centerY - (lineGap / 2);
-     const valueY = centerY + (lineGap / 2);
+     const titleY = row.y + (row.height * 0.25);
+     const valueY = row.y + (row.height * 0.75);
      const canDecrease = levelIndex > 0;
      const canIncrease = levelIndex < maxLevelIndex;
      const optionTextColor = optionsStyle.color || colors.controlText;
@@ -1426,33 +1424,90 @@ function getStatusSecondsRemaining() {
      return `${Math.ceil(activeStatusUi.timer / 60)}s`;
 }
 
-function getCircleMeterGlyph(circleMeterStyle, filledUnits) {
+function getCircleMeterAssetSrc(circleMeterStyle, filledUnits) {
      if (filledUnits >= progressUnitsPerCircle) {
-          return circleMeterStyle.fullChar;
+          return circleMeterStyle.fullAssetSrc;
      }
 
      if (filledUnits > 0) {
-          return circleMeterStyle.halfChar;
+          return circleMeterStyle.halfAssetSrc;
      }
 
-     return circleMeterStyle.emptyChar;
+     return circleMeterStyle.emptyAssetSrc;
 }
 
-function getCircleMeterInkMetrics(ctx, circleMeterStyle) {
-     const metrics = ctx.measureText(circleMeterStyle.fullChar);
-     const top = Number.isFinite(metrics.actualBoundingBoxAscent)
-          ? -metrics.actualBoundingBoxAscent
-          : 0;
-     const bottom = Number.isFinite(metrics.actualBoundingBoxDescent)
-          ? metrics.actualBoundingBoxDescent
-          : circleMeterStyle.fontSize;
+function getCircleMeterAssetImage(assetSrc) {
+     if (!assetSrc) {
+          return null;
+     }
+
+     if (!circleMeterAssetImages[assetSrc]) {
+          const image = new Image();
+          image.src = assetSrc;
+          circleMeterAssetImages[assetSrc] = image;
+     }
+
+     return circleMeterAssetImages[assetSrc];
+}
+
+function drawCircleMeterSlot(ctx, circleMeterStyle, filledUnits, x, y) {
+     const assetImage = getCircleMeterAssetImage(getCircleMeterAssetSrc(circleMeterStyle, filledUnits));
+
+     if (assetImage?.complete && assetImage.naturalWidth > 0) {
+          const iconSize = circleMeterStyle.fontSize * (circleMeterStyle.assetScale || 1);
+
+          ctx.drawImage(assetImage, x - (iconSize / 2), y, iconSize, iconSize);
+     }
+}
+
+function getCircleMeterInkMetrics(circleMeterStyle) {
+     const iconSize = circleMeterStyle.fontSize * (circleMeterStyle.assetScale || 1);
 
      return {
-          left: metrics.actualBoundingBoxLeft || 0,
-          right: metrics.actualBoundingBoxRight || 0,
-          top,
-          bottom: bottom > top ? bottom : circleMeterStyle.fontSize
+          left: -(iconSize / 2),
+          right: iconSize / 2,
+          top: 0,
+          bottom: iconSize
      };
+}
+
+function drawActiveHudBox(theme, x, y, width, height, side = "left") {
+     const { colors } = theme;
+     const borderWidth = theme.sizes.borderWidthFocus || theme.sizes.borderWidth || 1;
+     const cornerRadius = Math.min(getControlCornerRadius(theme, width, height), height * 0.18);
+     const isRightSide = side === "right";
+     const innerX = isRightSide ? x : x + width;
+     const outerX = isRightSide ? x + width : x;
+     const innerCornerX = isRightSide ? x + cornerRadius : x + width - cornerRadius;
+     const bottomY = y + height;
+     const cornerStartY = bottomY - cornerRadius;
+
+     miniGameCtx.save();
+     miniGameCtx.shadowBlur = 0;
+     miniGameCtx.fillStyle = colors.menuPanelFill;
+     miniGameCtx.beginPath();
+     miniGameCtx.moveTo(outerX, y);
+     miniGameCtx.lineTo(innerX, y);
+     miniGameCtx.lineTo(innerX, cornerStartY);
+     miniGameCtx.quadraticCurveTo(innerX, bottomY, innerCornerX, bottomY);
+     miniGameCtx.lineTo(outerX, bottomY);
+     miniGameCtx.closePath();
+     miniGameCtx.fill();
+
+     miniGameCtx.strokeStyle = getCssColor("--color-white", "#ffffff");
+     miniGameCtx.lineWidth = borderWidth;
+     miniGameCtx.beginPath();
+     miniGameCtx.moveTo(innerX - (isRightSide ? -borderWidth / 2 : borderWidth / 2), y);
+     miniGameCtx.lineTo(innerX - (isRightSide ? -borderWidth / 2 : borderWidth / 2), cornerStartY);
+     miniGameCtx.quadraticCurveTo(
+          innerX - (isRightSide ? -borderWidth / 2 : borderWidth / 2),
+          bottomY - (borderWidth / 2),
+          innerCornerX + (isRightSide ? borderWidth / 2 : -borderWidth / 2),
+          bottomY - (borderWidth / 2)
+     );
+     miniGameCtx.lineTo(outerX, bottomY - (borderWidth / 2));
+     miniGameCtx.stroke();
+     miniGameCtx.restore();
 }
 
 export function drawScore(theme) {
@@ -1460,12 +1515,11 @@ export function drawScore(theme) {
           return;
      }
 
-     const { colors, glow } = theme;
+     const { colors } = theme;
      const canvasSpacing = getTextStyle(theme, "canvasSpacing");
      const circleMeterStyle = getTextStyle(theme, "circleMeters");
      const levelStatusStyle = getTextStyle(theme, "levelStatus");
      const scoreReadyStyle = getTextStyle(theme, "scoreReady");
-     const scoreIconStyle = getTextStyle(theme, "scoreIcon");
      const levelText = "LEVELS";
      const starText = String(starScore).padStart(3, "0");
      const levelMeterUnits = getCurrentLevelMeterUnits();
@@ -1473,76 +1527,73 @@ export function drawScore(theme) {
      miniGameCtx.save();
      miniGameCtx.textAlign = "left";
      miniGameCtx.textBaseline = "top";
-     miniGameCtx.fillStyle = circleMeterStyle.color || colors.meterFull;
-     miniGameCtx.shadowColor = getCanvasGlowColor(circleMeterStyle.color || colors.meterGlow);
-     miniGameCtx.shadowBlur = circleMeterStyle.glow ? glow.uiSoftGlow : 0;
-     miniGameCtx.font = getTextFont(theme, "circleMeters", 400);
-
      const circleAdvance =
           (circleMeterStyle.fontSize * circleMeterStyle.advanceScale) +
           (circleMeterStyle.letterSpacing || 0);
      const circleSlots = maxLevelProgressUnits / progressUnitsPerCircle;
-     const leftEdgeX = canvasSpacing.uiPadding;
-     const circleInkMetrics = getCircleMeterInkMetrics(miniGameCtx, circleMeterStyle);
-     const levelY = canvasSpacing.uiPadding;
+     const panelPadding = canvasSpacing.uiPadding;
+     const panelX = 0;
+     const panelY = 0;
+     const circleInkMetrics = getCircleMeterInkMetrics(circleMeterStyle);
+     const meterWidth =
+          ((circleSlots - 1) * circleAdvance) +
+          circleInkMetrics.right -
+          circleInkMetrics.left;
+     const levelY = panelY + panelPadding;
+     const meterY = levelY + levelStatusStyle.fontSize + canvasSpacing.circleTitleGap - circleInkMetrics.top;
+     const starY = meterY + circleInkMetrics.bottom + canvasSpacing.uiRowGap;
+
+     miniGameCtx.font = getTextFont(theme, "scoreReady", 400);
+     const scoreRowWidth = miniGameCtx.measureText(starText).width;
+     miniGameCtx.font = getTextFont(theme, "levelStatus", 400);
+     const levelTextWidth =
+          miniGameCtx.measureText(levelText).width +
+          ((levelStatusStyle.letterSpacing || 0) * Math.max(0, levelText.length - 1));
+     const panelWidth = Math.max(levelTextWidth, meterWidth, scoreRowWidth) + (panelPadding * 2);
+     const panelHeight =
+          (starY - panelY) +
+          scoreReadyStyle.fontSize +
+          panelPadding;
+     const panelCenterX = panelX + (panelWidth / 2);
+
+     drawActiveHudBox(theme, panelX, panelY, panelWidth, panelHeight, "left");
+
      drawStyledCanvasText(
           miniGameCtx,
           levelText,
-          leftEdgeX,
+          panelCenterX,
           levelY,
           "levelStatus",
           theme,
           {
                color: levelStatusStyle.color || colors.meterFull,
-               align: "left",
+               align: "center",
                baseline: "top"
           }
      );
 
-     const meterY = levelY + levelStatusStyle.fontSize + canvasSpacing.circleTitleGap - circleInkMetrics.top;
-     let currentX = leftEdgeX + circleInkMetrics.left;
-
      miniGameCtx.save();
-     miniGameCtx.translate(leftEdgeX, meterY);
+     miniGameCtx.translate(panelCenterX, meterY);
      miniGameCtx.scale(getLevelMeterPulseScale(), getLevelMeterPulseScale());
+     miniGameCtx.textAlign = "center";
 
      for (let i = 0; i < circleSlots; i += 1) {
           const slotUnits = Math.max(0, Math.min(progressUnitsPerCircle, levelMeterUnits - (i * progressUnitsPerCircle)));
+          const circleX = (i - ((circleSlots - 1) / 2)) * circleAdvance;
 
-          miniGameCtx.fillText(getCircleMeterGlyph(circleMeterStyle, slotUnits), currentX - leftEdgeX, 0);
-          currentX += circleAdvance;
+          drawCircleMeterSlot(miniGameCtx, circleMeterStyle, slotUnits, circleX, 0);
      }
 
      miniGameCtx.restore();
 
-     const starY = meterY + circleInkMetrics.bottom + canvasSpacing.uiRowGap;
-     const scoreIconX = leftEdgeX + scoreIconStyle.xOffset;
-     const scoreIconY = starY + scoreIconStyle.yOffset;
-
-     miniGameCtx.font = getTextFont(theme, "scoreIcon", 400);
-     const scoreIconWidth = miniGameCtx.measureText(scoreIconStyle.particle).width;
-
-     drawGlowingCanvasText(
-          miniGameCtx,
-          scoreIconStyle.particle,
-          scoreIconX,
-          scoreIconY,
-          scoreIconStyle.color || colors.meterFull,
-          getTextFont(theme, "scoreIcon", 400),
-          "left",
-          "top",
-          theme,
-          scoreIconStyle.glow
-     );
-
      drawGlowingCanvasText(
           miniGameCtx,
           starText,
-          scoreIconX + scoreIconWidth + scoreIconStyle.gap,
+          panelCenterX,
           starY,
           scoreReadyStyle.color || colors.meterFull,
           getTextFont(theme, "scoreReady", 400),
-          "left",
+          "center",
           "top",
           theme,
           scoreReadyStyle.glow
@@ -1556,126 +1607,112 @@ export function drawHealth(theme) {
           return;
      }
 
-     const { colors, glow } = theme;
+     const { colors } = theme;
      const canvasSpacing = getTextStyle(theme, "canvasSpacing");
      const circleMeterStyle = getTextStyle(theme, "circleMeters");
      const levelStatusStyle = getTextStyle(theme, "levelStatus");
      const scoreReadyStyle = getTextStyle(theme, "scoreReady");
-     const statusIconStyle = getTextStyle(theme, "statusIcon");
      const statusTitle = "STATUS";
      const statusLabel = activeStatusUi.label || "READY";
      const statusSeconds = getStatusSecondsRemaining();
-     const statusIcon = activeStatusUi.particle || "";
 
      miniGameCtx.save();
-     miniGameCtx.textAlign = "right";
+     miniGameCtx.textAlign = "left";
      miniGameCtx.textBaseline = "top";
-     miniGameCtx.fillStyle = circleMeterStyle.color || colors.statusText;
-     miniGameCtx.shadowColor = getCanvasGlowColor(circleMeterStyle.color || colors.statusTextGlow);
-     miniGameCtx.shadowBlur = circleMeterStyle.glow ? glow.uiSoftGlow : 0;
-
-     miniGameCtx.font = getTextFont(theme, "circleMeters", 400);
-
      const circleAdvance =
           (circleMeterStyle.fontSize * circleMeterStyle.advanceScale) +
           (circleMeterStyle.letterSpacing || 0);
      const healthUnits = playerHealth;
      const maxHealthUnits = maxVisibleHearts * progressUnitsPerCircle;
      const circleSlots = maxHealthUnits / progressUnitsPerCircle;
-     const rightEdgeX = miniGameWidth - canvasSpacing.uiPadding;
-     const circleInkMetrics = getCircleMeterInkMetrics(miniGameCtx, circleMeterStyle);
-     const statusTitleY = canvasSpacing.uiPadding;
+     const circleInkMetrics = getCircleMeterInkMetrics(circleMeterStyle);
+     const panelPadding = canvasSpacing.uiPadding;
+     const meterWidth =
+          ((circleSlots - 1) * circleAdvance) +
+          circleInkMetrics.right -
+          circleInkMetrics.left;
+     const detailLineHeight = scoreReadyStyle.fontSize;
+     const hasStatusSeconds = Boolean(statusSeconds);
+     const statusSecondsHeight = hasStatusSeconds
+          ? scoreReadyStyle.fontSize + canvasSpacing.uiRowGap
+          : 0;
+     const statusLabelWidth = (() => {
+          miniGameCtx.font = getTextFont(theme, "scoreReady", 400);
+          return miniGameCtx.measureText(statusLabel).width;
+     })();
+     const statusRowWidth = statusLabelWidth;
+     miniGameCtx.font = getTextFont(theme, "levelStatus", 400);
+     const statusTitleWidth =
+          miniGameCtx.measureText(statusTitle).width +
+          ((levelStatusStyle.letterSpacing || 0) * Math.max(0, statusTitle.length - 1));
+     const panelWidth = Math.max(statusTitleWidth, meterWidth, statusRowWidth) + (panelPadding * 2);
+     const panelX = miniGameWidth - panelWidth;
+     const panelY = 0;
+     const panelCenterX = panelX + (panelWidth / 2);
+     const statusTitleY = panelY + panelPadding;
+     const meterY = statusTitleY + levelStatusStyle.fontSize + canvasSpacing.circleTitleGap - circleInkMetrics.top;
+     const statusDetailY = meterY + circleInkMetrics.bottom + canvasSpacing.uiRowGap;
+     const panelHeight =
+          (statusDetailY - panelY) +
+          detailLineHeight +
+          statusSecondsHeight +
+          panelPadding;
+
+     drawActiveHudBox(theme, panelX, panelY, panelWidth, panelHeight, "right");
 
      drawStyledCanvasText(
           miniGameCtx,
           statusTitle,
-          rightEdgeX,
+          panelCenterX,
           statusTitleY,
           "levelStatus",
           theme,
           {
                color: levelStatusStyle.color || colors.statusText,
-               align: "right",
+               align: "center",
                baseline: "top"
           }
      );
 
-     const meterY = statusTitleY + levelStatusStyle.fontSize + canvasSpacing.circleTitleGap - circleInkMetrics.top;
-     let currentX = rightEdgeX - circleInkMetrics.right;
-
      miniGameCtx.save();
-     miniGameCtx.translate(rightEdgeX, meterY);
+     miniGameCtx.translate(panelCenterX, meterY);
      miniGameCtx.scale(getHealthMeterPulseScale(), getHealthMeterPulseScale());
+     miniGameCtx.textAlign = "center";
 
      for (let i = 0; i < circleSlots; i += 1) {
-          const slotUnits = Math.max(0, Math.min(progressUnitsPerCircle, healthUnits - (i * progressUnitsPerCircle)));
+          const fillIndex = circleSlots - 1 - i;
+          const slotUnits = Math.max(0, Math.min(progressUnitsPerCircle, healthUnits - (fillIndex * progressUnitsPerCircle)));
+          const circleX = (i - ((circleSlots - 1) / 2)) * circleAdvance;
 
-          miniGameCtx.fillText(getCircleMeterGlyph(circleMeterStyle, slotUnits), currentX - rightEdgeX, 0);
-          currentX -= circleAdvance;
+          drawCircleMeterSlot(miniGameCtx, circleMeterStyle, slotUnits, circleX, 0);
      }
 
      miniGameCtx.restore();
 
-     const statusDetailY = meterY + circleInkMetrics.bottom + canvasSpacing.uiRowGap;
+     drawGlowingCanvasText(
+          miniGameCtx,
+          statusLabel,
+          panelCenterX,
+          statusDetailY,
+          scoreReadyStyle.color || colors.statusText,
+          getTextFont(theme, "scoreReady", 400),
+          "center",
+          "top",
+          theme,
+          scoreReadyStyle.glow
+     );
 
-     if (statusIcon) {
-          const iconX = rightEdgeX + statusIconStyle.xOffset;
-
-          miniGameCtx.font = getTextFont(theme, "statusIcon", 400);
-          const statusIconWidth = miniGameCtx.measureText(statusIcon).width;
-          const statusTextX = iconX - statusIconWidth - statusIconStyle.gap;
+     if (statusSeconds) {
+          const statusSecondsY = statusDetailY + scoreReadyStyle.fontSize + canvasSpacing.uiRowGap;
 
           drawGlowingCanvasText(
                miniGameCtx,
-               statusLabel,
-               statusTextX,
-               statusDetailY,
+               statusSeconds,
+               panelCenterX,
+               statusSecondsY,
                scoreReadyStyle.color || colors.statusText,
                getTextFont(theme, "scoreReady", 400),
-               "right",
-               "top",
-               theme,
-               scoreReadyStyle.glow
-          );
-
-          drawGlowingCanvasText(
-               miniGameCtx,
-               statusIcon,
-               iconX,
-               statusDetailY + statusIconStyle.yOffset,
-               statusIconStyle.color || colors.statusText,
-               getTextFont(theme, "statusIcon", 400),
-               "right",
-               "top",
-               theme,
-               statusIconStyle.glow
-          );
-
-          if (statusSeconds) {
-               const statusSecondsY = statusDetailY + scoreReadyStyle.fontSize + canvasSpacing.uiRowGap;
-
-               drawGlowingCanvasText(
-                    miniGameCtx,
-                    statusSeconds,
-                    rightEdgeX,
-                    statusSecondsY,
-                    scoreReadyStyle.color || colors.statusText,
-                    getTextFont(theme, "scoreReady", 400),
-                    "right",
-                    "top",
-                    theme,
-                    scoreReadyStyle.glow
-               );
-          }
-     } else {
-          drawGlowingCanvasText(
-               miniGameCtx,
-               "READY",
-               rightEdgeX,
-               statusDetailY,
-               scoreReadyStyle.color || colors.statusText,
-               getTextFont(theme, "scoreReady", 400),
-               "right",
+               "center",
                "top",
                theme,
                scoreReadyStyle.glow
@@ -1862,7 +1899,7 @@ function drawMenuDetailLines(theme, lines, startY, options = {}) {
      miniGameCtx.shadowBlur = 0;
      miniGameCtx.font = getTextFont(theme, "buttonsOptions", 400);
 
-     function drawCenteredDetailLine(line, firstSegment, bodyText) {
+     function measureDetailLine(firstSegment, bodyText) {
           const hasLeadingIcon = firstSegment?.type === "icon";
           const textFont = getTextFont(theme, "buttonsOptions", 400);
           let icon = null;
@@ -1882,8 +1919,57 @@ function drawMenuDetailLines(theme, lines, startY, options = {}) {
                }
           }
 
-          const totalWidth = iconWidth + (icon ? iconGap : 0) + textWidth;
-          let currentX = (miniGameWidth - totalWidth) / 2;
+          return iconWidth + (icon ? iconGap : 0) + textWidth;
+     }
+
+     function getCenteredBodyBlockX() {
+          if (!shouldCenterContent) {
+               return 0;
+          }
+
+          let maxBodyLineWidth = 0;
+
+          lines.forEach((line) => {
+               if (!line.trim() || sectionHeadings.has(line)) {
+                    return;
+               }
+
+               const richSegments = parseRichTextSegments(line);
+               const firstSegment = richSegments[0];
+               const hasLeadingIcon = firstSegment?.type === "icon";
+               const bodyText = hasLeadingIcon
+                    ? richSegments
+                         .slice(1)
+                         .map((segment) => segment.value)
+                         .join("")
+                         .trimStart()
+                    : line;
+
+               maxBodyLineWidth = Math.max(maxBodyLineWidth, measureDetailLine(firstSegment, bodyText));
+          });
+
+          return (miniGameWidth - maxBodyLineWidth) / 2;
+     }
+
+     const centeredBodyBlockX = getCenteredBodyBlockX();
+
+     function drawCenteredDetailLine(line, firstSegment, bodyText) {
+          const hasLeadingIcon = firstSegment?.type === "icon";
+          const textFont = getTextFont(theme, "buttonsOptions", 400);
+          let icon = null;
+          let iconFont = textFont;
+          let iconWidth = 0;
+          const iconGap = hasLeadingIcon ? fontSize * 0.45 : 0;
+          let currentX = centeredBodyBlockX;
+
+          if (hasLeadingIcon) {
+               icon = getRichTextIcon(theme, firstSegment.value);
+
+               if (icon) {
+                    iconFont = getTextFont(theme, "buttonsOptions", 400, "body", getRichTextIconSize(icon, fontSize));
+                    iconWidth = getRichTextIconWidth(miniGameCtx, icon, fontSize, iconFont);
+               }
+          }
 
           if (icon) {
                const iconX = currentX + (icon.xOffset || 0);
