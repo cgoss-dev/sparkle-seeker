@@ -102,6 +102,41 @@ body {
      }
 }
 
+@media (max-width: 42rem) {
+     :root {
+          --game-board-width: 100vw;
+          --game-board-height-available: 100dvh;
+          --game-board-height: 100dvh;
+          --game-board-top: 0px;
+          --header-top: 0px;
+     }
+
+     .body-ody {
+          padding: 0;
+     }
+
+     .main-squeeze {
+          height: 100dvh;
+     }
+
+     .hero-stack,
+     .game-container {
+          width: 100vw;
+          max-width: 100vw;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+     }
+
+     .game-container::after {
+          display: none;
+     }
+
+     #miniGameCanvas {
+          border-radius: 0;
+     }
+}
+
 @media (min-width: 64rem) and (min-height: 48rem) {
      :root {
           --game-board-width-step: 70;
