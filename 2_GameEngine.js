@@ -37,10 +37,10 @@ import {
      gameOverlayDuration,
      musicLevel,
      soundEffectsLevel,
-     baneLevel,
+     blightLevel,
      movementLevel,
      colorLevel,
-     boostBanePickups,
+     boostblightPickups,
      starScore,
      playerHealth,
 
@@ -56,7 +56,7 @@ import {
      setGameOverlayDuration,
      setMusicLevel,
      setSoundEffectsLevel,
-     setBaneLevel,
+     setblightLevel,
      setMovementLevel,
      setColorLevel,
      setMiniGameSize,
@@ -93,18 +93,18 @@ import {
      updatePlayer,
      updatePlayerFaceState,
      resetEntityColorCycle,
-     updateBoostBaneState,
+     updateBoostblightState,
      updateStarSpawns,
      updateStars,
      updateStrikes,
-     updateBoostBanePickups,
+     updateBoostblightPickups,
      updateCollisionBursts,
      collectStars,
      collectStrikes,
-     collectBoostBanePickups,
+     collectBoostblightPickups,
      updatePlayerTrail,
-     resetBoostBaneIntroState,
-     setBoostBaneIntroCallback
+     resetBoostblightIntroState,
+     setBoostblightIntroCallback
 } from "./8_Entities.js";
 
 import {
@@ -124,7 +124,7 @@ import {
 } from "./7_Draw.js";
 
 import {
-     starShowerBoostBaneIcons
+     starShowerBoostblightIcons
 } from "./9_Config.js";
 
 import {
@@ -341,7 +341,7 @@ export function startNewGameRound() {
      resetGameState();
      resetTouchControls();
      resetEntityColorCycle();
-     resetBoostBaneIntroState();
+     resetBoostblightIntroState();
      resetLevelProgressState();
 
      syncCanvasResolutionAndUiBounds();
@@ -394,8 +394,8 @@ function getNextColorOptionIndex(levelIndex) {
      return Math.min(maxColorOptionIndex, levelIndex + 1);
 }
 
-export function getBaneToggleLabel() {
-     return getOptionLevelLabel(baneLevel);
+export function getblightToggleLabel() {
+     return getOptionLevelLabel(blightLevel);
 }
 
 export function getMusicToggleLabel() {
@@ -434,19 +434,19 @@ export function increaseSoundEffectsLevel() {
      saveCurrentOptions();
 }
 
-export function decreaseBaneLevel() {
-     const nextLevel = getPreviousOptionLevelIndex(baneLevel);
-     setBaneLevel(nextLevel);
+export function decreaseblightLevel() {
+     const nextLevel = getPreviousOptionLevelIndex(blightLevel);
+     setblightLevel(nextLevel);
 
      if (nextLevel === 0) {
-          boostBanePickups.length = 0;
+          boostblightPickups.length = 0;
      }
 
      saveCurrentOptions();
 }
 
-export function increaseBaneLevel() {
-     setBaneLevel(getNextOptionLevelIndex(baneLevel));
+export function increaseblightLevel() {
+     setblightLevel(getNextOptionLevelIndex(blightLevel));
      saveCurrentOptions();
 }
 
@@ -495,10 +495,10 @@ function showNewEntityPopup(entityType) {
           return;
      }
 
-     levelPopupText = `NEW ${entityType.category === "bane" ? "BANE" : "BOOST"}`;
+     levelPopupText = `NEW ${entityType.category === "blight" ? "blight" : "BOOST"}`;
      levelPopupSubtext = entityType.label || "";
-     levelPopupIcon = Object.keys(starShowerBoostBaneIcons).find(
-          (iconName) => starShowerBoostBaneIcons[iconName] === entityType
+     levelPopupIcon = Object.keys(starShowerBoostblightIcons).find(
+          (iconName) => starShowerBoostblightIcons[iconName] === entityType
      ) || "";
      levelPopupTimer = levelPopupDuration;
      levelPopupDurationFrames = levelPopupDuration;
@@ -638,17 +638,17 @@ export function updateGame() {
           return;
      }
 
-     updateBoostBaneState();
+     updateBoostblightState();
      updatePlayer();
      updateStarSpawns();
      updateStars();
      updateStrikes();
-     updateBoostBanePickups();
+     updateBoostblightPickups();
      updateCollisionBursts();
      updatePlayerTrail();
      collectStars();
      collectStrikes();
-     collectBoostBanePickups();
+     collectBoostblightPickups();
      syncLevelProgressState();
 
      if (playerHealth <= 0) {
@@ -689,12 +689,12 @@ function gameLoop() {
 
 export function startStarShower() {
      loadAndApplySavedOptions();
-     setBoostBaneIntroCallback(showNewEntityPopup);
+     setBoostblightIntroCallback(showNewEntityPopup);
 
      resetGameState();
      resetTouchControls();
      resetEntityColorCycle();
-     resetBoostBaneIntroState();
+     resetBoostblightIntroState();
 
      syncCanvasResolutionAndUiBounds();
      resetPlayerPosition();

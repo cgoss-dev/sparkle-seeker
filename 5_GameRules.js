@@ -60,7 +60,7 @@ const levelChallengeProgression = [
           introIcon: "iconHealth",
           strikesUnlocked: true,
           boostNames: ["health"],
-          baneNames: []
+          blightNames: []
      },
      {
           introText: "FREEZE",
@@ -68,7 +68,7 @@ const levelChallengeProgression = [
           introIcon: "iconFreeze",
           strikesUnlocked: true,
           boostNames: ["health"],
-          baneNames: ["freeze"]
+          blightNames: ["freeze"]
      },
      {
           introText: "MAGNET",
@@ -76,7 +76,7 @@ const levelChallengeProgression = [
           introIcon: "iconMagnet",
           strikesUnlocked: true,
           boostNames: ["health", "magnet"],
-          baneNames: ["freeze"]
+          blightNames: ["freeze"]
      },
      {
           introText: "DAZE",
@@ -84,7 +84,7 @@ const levelChallengeProgression = [
           introIcon: "iconDaze",
           strikesUnlocked: true,
           boostNames: ["health", "magnet"],
-          baneNames: ["freeze", "daze"]
+          blightNames: ["freeze", "daze"]
      },
      {
           introText: "DOUBLE",
@@ -92,7 +92,7 @@ const levelChallengeProgression = [
           introIcon: "iconDouble",
           strikesUnlocked: true,
           boostNames: ["health", "magnet", "double"],
-          baneNames: ["freeze", "daze"]
+          blightNames: ["freeze", "daze"]
      },
      {
           introText: "FOG",
@@ -100,7 +100,7 @@ const levelChallengeProgression = [
           introIcon: "iconFog",
           strikesUnlocked: true,
           boostNames: ["health", "magnet", "double"],
-          baneNames: ["freeze", "daze", "fog"]
+          blightNames: ["freeze", "daze", "fog"]
      }
 ];
 
@@ -116,7 +116,7 @@ const levelRules = Array.from({ length: maxLevelProgressUnits }, (_, index) => {
           introIcon: index < levelChallengeProgression.length ? progression.introIcon : "",
           strikesUnlocked: progression.strikesUnlocked,
           boostNames: progression.boostNames,
-          baneNames: progression.baneNames
+          blightNames: progression.blightNames
      };
 });
 
@@ -129,7 +129,7 @@ const screenActionTexts = ["NEW GAME", "TIPS", "OPTIONS", "DEVELOPER"];
 const pausedActionTexts = ["RESUME", "NEW GAME", "TIPS", "OPTIONS", "DEVELOPER"];
 const welcomeInstructionLines = [
      "Collect stars, avoid strikes.",
-     "To navigate, use pointer or arrows."
+     "Effects can boost or blight."
 ];
 
 export function getWelcomeTitleLines() {
@@ -192,7 +192,7 @@ export function getBoostLines() {
      ];
 }
 
-export function getBaneLines() {
+export function getblightLines() {
      return [
           "{iconFreeze} Freeze: freezes player.",
           "{iconDaze} Daze: reverses movement.",
@@ -203,10 +203,10 @@ export function getBaneLines() {
 export function getDifficultyOptionLines() {
      return [
           "OFF: stars and strikes.",
-          "MIN: boosts and banes 0.25x.",
-          "LOW: boosts and banes 1x.",
-          "MED: boosts and banes 2x.",
-          "MAX: boosts and banes 4x."
+          "MIN: boosts and blights 0.25x.",
+          "LOW: boosts and blights 1x.",
+          "MED: boosts and blights 2x.",
+          "MAX: boosts and blights 4x."
      ];
 }
 
@@ -237,8 +237,8 @@ export function getMovementOptionLines() {
 
 export function getColorOptionLines() {
      return [
-          "Bright: white stars; boosts and banes use rainbow colors.",
-          "Pastel: white stars; boosts and banes use soft Catppuccin Mocha colors.",
+          "Bright: white stars; boosts and blights use rainbow colors.",
+          "Pastel: white stars; boosts and blights use soft Catppuccin Mocha colors.",
           "Monochrome: white, gray, and black."
      ];
 }
@@ -286,8 +286,8 @@ export function getUnlockedBoostNamesForCurrentLevel() {
      return getCurrentLevelData().boostNames;
 }
 
-export function getUnlockedBaneNamesForCurrentLevel() {
-     return getCurrentLevelData().baneNames;
+export function getUnlockedblightNamesForCurrentLevel() {
+     return getCurrentLevelData().blightNames;
 }
 
 export function getLevelIntroText(levelNumber) {

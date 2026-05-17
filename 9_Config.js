@@ -37,7 +37,7 @@ export const starShowerRainbowPalette = [
 
 
 
-export const starShowerBoostBaneIcons = {
+export const starShowerBoostblightIcons = {
 
      // NOTE: BOOSTS
 
@@ -77,10 +77,10 @@ export const starShowerBoostBaneIcons = {
           xOffset: -1
      },
 
-     // NOTE: BANES
+     // NOTE: blightS
 
      iconFreeze: {
-          category: "bane",
+          category: "blight",
           name: "freeze",
           label: "FREEZE",
           particle: "\u2744\uFE0E",
@@ -92,7 +92,7 @@ export const starShowerBoostBaneIcons = {
      },
 
      iconDaze: {
-          category: "bane",
+          category: "blight",
           name: "daze",
           label: "DAZE",
           particle: "\u2300\uFE0E",
@@ -104,7 +104,7 @@ export const starShowerBoostBaneIcons = {
      },
 
      iconFog: {
-          category: "bane",
+          category: "blight",
           name: "fog",
           label: "FOG",
           particle: "\u224B\uFE0E",
@@ -288,7 +288,7 @@ export function getCanvasTheme() {
 
           guideIcons: {
                ...starShowerGuideIcons,
-               ...starShowerBoostBaneIcons
+               ...starShowerBoostblightIcons
           }
      };
 

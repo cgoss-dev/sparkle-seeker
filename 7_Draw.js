@@ -42,7 +42,7 @@ import {
      gameMenuUi,
      musicLevel,
      soundEffectsLevel,
-     baneLevel,
+     blightLevel,
      movementLevel,
      colorLevel,
      screenActionUi,
@@ -53,7 +53,7 @@ import {
      optionsSelection,
      gameMenuScroll,
      getMenuKeyboardFocusAlpha,
-     isBoostBaneActive,
+     isBoostblightActive,
      hoverCanvasX,
      hoverCanvasY,
      isCanvasPointerInside,
@@ -97,7 +97,7 @@ import {
 import {
      drawStars,
      drawStrikes,
-     drawBoostBanePickups,
+     drawBoostblightPickups,
      drawCollisionBursts,
      playerFaces,
      playerTrail,
@@ -125,7 +125,7 @@ import {
      getWelcomeInstructionLines,
      getHowToPlayLines,
      getBoostLines,
-     getBaneLines,
+     getblightLines,
      getDifficultyOptionLines,
      getAudioOptionLines,
      getMovementOptionLines,
@@ -276,12 +276,12 @@ function getHoverableCanvasButtons() {
           }
 
           if (gameMenuView === "options") {
-               if (baneLevel > 0) {
-                    buttons.push(gameMenuUi.baneDecreaseButton);
+               if (blightLevel > 0) {
+                    buttons.push(gameMenuUi.blightDecreaseButton);
                }
 
-               if (baneLevel < maxOptionLevelIndex) {
-                    buttons.push(gameMenuUi.baneIncreaseButton);
+               if (blightLevel < maxOptionLevelIndex) {
+                    buttons.push(gameMenuUi.blightIncreaseButton);
                }
 
                if (isJoystickEnabled() && movementLevel > 0) {
@@ -380,9 +380,9 @@ function updateMenuUiBounds(theme = getCanvasTheme()) {
           const showMovementOption = isJoystickEnabled();
           const optionRows = [
                {
-                    row: gameMenuUi.baneRow,
-                    decreaseButton: gameMenuUi.baneDecreaseButton,
-                    increaseButton: gameMenuUi.baneIncreaseButton
+                    row: gameMenuUi.blightRow,
+                    decreaseButton: gameMenuUi.blightDecreaseButton,
+                    increaseButton: gameMenuUi.blightIncreaseButton
                }
           ];
 
@@ -438,9 +438,9 @@ function updateMenuUiBounds(theme = getCanvasTheme()) {
 
      if (gameMenuView === "options_difficulty") {
           setOptionRowBounds(
-               gameMenuUi.baneRow,
-               gameMenuUi.baneDecreaseButton,
-               gameMenuUi.baneIncreaseButton,
+               gameMenuUi.blightRow,
+               gameMenuUi.blightDecreaseButton,
+               gameMenuUi.blightIncreaseButton,
                layout.buttonX,
                layout.contentTopY,
                layout.buttonWidth,
@@ -1735,7 +1735,7 @@ export function drawHealth(theme) {
 }
 
 export function drawFogOverlay() {
-     if (!miniGameCtx || !isBoostBaneActive("fog")) {
+     if (!miniGameCtx || !isBoostblightActive("fog")) {
           return;
      }
 
@@ -1836,8 +1836,8 @@ function drawTipsMenuScreen(theme) {
           "BOOSTS",
           ...getBoostLines(),
           "",
-          "BANES",
-          ...getBaneLines()
+          "blightS",
+          ...getblightLines()
      ];
 
      miniGameCtx.save();
@@ -1901,7 +1901,7 @@ function drawMenuDetailLines(theme, lines, startY, options = {}) {
      const iconX = screenLayout.sidePadding + (iconGutterWidth * 0.25);
      const detailTextX = screenLayout.sidePadding + iconGutterWidth;
      const detailTextWidth = miniGameWidth - detailTextX - screenLayout.sidePadding;
-     const sectionHeadings = new Set(["TIPS", "BOOSTS", "BANES"]);
+     const sectionHeadings = new Set(["TIPS", "BOOSTS", "blightS"]);
      const shouldCenterContent = Boolean(options.centerContent);
 
      miniGameCtx.fillStyle = detailStyle.color || colors.fontColor;
@@ -2135,12 +2135,12 @@ function drawOptionsScreen(theme) {
      drawMenuScreenTitle("OPTIONS", theme, layout.titleCenterX, layout.titleY);
 
      drawOptionStepper(
-          gameMenuUi.baneRow,
-          gameMenuUi.baneDecreaseButton,
-          gameMenuUi.baneIncreaseButton,
+          gameMenuUi.blightRow,
+          gameMenuUi.blightDecreaseButton,
+          gameMenuUi.blightIncreaseButton,
           "DIFFICULTY",
-          getDifficultyOptionDescription(baneLevel),
-          baneLevel,
+          getDifficultyOptionDescription(blightLevel),
+          blightLevel,
           theme,
           focused.row === 0,
           focused.row === 0 ? focused.col : -1
@@ -2196,12 +2196,12 @@ function drawDifficultyOptionsScreen(theme) {
      drawMenuScreenTitle("DIFFICULTY", theme, layout.titleCenterX, layout.titleY);
 
      drawOptionStepper(
-          gameMenuUi.baneRow,
-          gameMenuUi.baneDecreaseButton,
-          gameMenuUi.baneIncreaseButton,
+          gameMenuUi.blightRow,
+          gameMenuUi.blightDecreaseButton,
+          gameMenuUi.blightIncreaseButton,
           "Difficulty",
-          getShortOptionLevelLabel(baneLevel),
-          baneLevel,
+          getShortOptionLevelLabel(blightLevel),
+          blightLevel,
           theme,
           focused.row === 0,
           focused.row === 0 ? focused.col : -1
@@ -2840,7 +2840,7 @@ export function drawGame() {
      if (gameStarted) {
           drawStars();
           drawStrikes();
-          drawBoostBanePickups();
+          drawBoostblightPickups();
           drawCollisionBursts();
           drawPlayerTrail();
           drawPlayer();

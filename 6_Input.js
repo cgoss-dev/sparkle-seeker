@@ -31,7 +31,7 @@ import {
      gameMenuView,
      gameOver,
      gameWon,
-     baneLevel,
+     blightLevel,
      movementLevel,
      colorLevel,
      gameMenuUi,
@@ -89,8 +89,8 @@ import {
      isScreenWelcomeActive,
      isOverlayScreenActive,
      startNewGameRound,
-     decreaseBaneLevel,
-     increaseBaneLevel,
+     decreaseblightLevel,
+     increaseblightLevel,
      decreaseMusicLevel,
      increaseMusicLevel,
      decreaseSoundEffectsLevel,
@@ -362,8 +362,8 @@ function closeMenuAndRefresh() {
 }
 
 function activateOptionAdjustment(optionName, direction) {
-     if (optionName === "bane") {
-          direction < 0 ? decreaseBaneLevel() : increaseBaneLevel();
+     if (optionName === "blight") {
+          direction < 0 ? decreaseblightLevel() : increaseblightLevel();
      }
 
      if (optionName === "music") {
@@ -487,18 +487,18 @@ function handleOptionsPointerDown(x, y) {
           return true;
      }
 
-     if (baneLevel > 0 && isPointInsideBox(x, y, gameMenuUi.baneDecreaseButton)) {
+     if (blightLevel > 0 && isPointInsideBox(x, y, gameMenuUi.blightDecreaseButton)) {
           setOptionsSelectionRow(0);
           setOptionsSelectionCol(0);
-          decreaseBaneLevel();
+          decreaseblightLevel();
           syncUiBounds();
           return true;
      }
 
-     if (baneLevel < maxOptionLevelIndex && isPointInsideBox(x, y, gameMenuUi.baneIncreaseButton)) {
+     if (blightLevel < maxOptionLevelIndex && isPointInsideBox(x, y, gameMenuUi.blightIncreaseButton)) {
           setOptionsSelectionRow(0);
           setOptionsSelectionCol(1);
-          increaseBaneLevel();
+          increaseblightLevel();
           syncUiBounds();
           return true;
      }
@@ -559,18 +559,18 @@ function handleOptionsDetailPointerDown(x, y) {
      }
 
      if (gameMenuView === "options_difficulty") {
-          if (isPointInsideBox(x, y, gameMenuUi.baneDecreaseButton)) {
+          if (isPointInsideBox(x, y, gameMenuUi.blightDecreaseButton)) {
                setOptionsSelectionRow(0);
                setOptionsSelectionCol(0);
-               decreaseBaneLevel();
+               decreaseblightLevel();
                syncUiBounds();
                return true;
           }
 
-          if (isPointInsideBox(x, y, gameMenuUi.baneIncreaseButton)) {
+          if (isPointInsideBox(x, y, gameMenuUi.blightIncreaseButton)) {
                setOptionsSelectionRow(0);
                setOptionsSelectionCol(1);
-               increaseBaneLevel();
+               increaseblightLevel();
                syncUiBounds();
                return true;
           }
@@ -880,7 +880,7 @@ function activateOptionsSelection() {
      }
 
      const optionName =
-          optionsSelection.row === 0 ? "bane" :
+          optionsSelection.row === 0 ? "blight" :
           optionsSelection.row === 1 && isJoystickEnabled() ? "movement" :
           "color";
      const direction = optionsSelection.col === 0 ? -1 : 1;
@@ -897,7 +897,7 @@ function activateOptionsDetailSelection() {
           }
 
           const direction = optionsSelection.col === 0 ? -1 : 1;
-          activateOptionAdjustment("bane", direction);
+          activateOptionAdjustment("blight", direction);
           return;
      }
 

@@ -56,7 +56,7 @@ export const player = {
 export const keys = {};
 export const stars = [];
 export const strikes = [];
-export const boostBanePickups = [];
+export const boostblightPickups = [];
 export const collisionBursts = [];
 
 // ==================================================
@@ -75,17 +75,17 @@ export let playerHealth = gameplayStartingHealth;
 
 export let musicLevel = defaultOptionLevelIndex;
 export let soundEffectsLevel = defaultOptionLevelIndex;
-export let baneLevel = defaultOptionLevelIndex;
+export let blightLevel = defaultOptionLevelIndex;
 export let movementLevel = 0;
 export let colorLevel = 0;
 
 // ==================================================
 // EFFECT STATE
-// Runtime storage only. Boost/bane rules live elsewhere.
+// Runtime storage only. Boost/blight rules live elsewhere.
 // Timers are frame counts, so 60 frames is roughly 1 second.
 // ==================================================
 
-export const boostBaneTimers = {
+export const boostblightTimers = {
      magnet: 0,
      double: 0,
 
@@ -116,7 +116,7 @@ export let gameMenuView = "";
 // Compatibility booleans for systems that still expect simple flags.
 export let musicEnabled = true;
 export let soundEffectsEnabled = true;
-export let baneEnabled = true;
+export let blightEnabled = true;
 
 export let gameOver = false;
 export let gameWon = false;
@@ -147,9 +147,9 @@ export const gameMenuUi = {
      optionsMovementButton: { x: 0, y: 0, width: 0, height: 0 },
      optionsColorButton: { x: 0, y: 0, width: 0, height: 0 },
 
-     baneRow: { x: 0, y: 0, width: 0, height: 0 },
-     baneDecreaseButton: { x: 0, y: 0, width: 0, height: 0 },
-     baneIncreaseButton: { x: 0, y: 0, width: 0, height: 0 },
+     blightRow: { x: 0, y: 0, width: 0, height: 0 },
+     blightDecreaseButton: { x: 0, y: 0, width: 0, height: 0 },
+     blightIncreaseButton: { x: 0, y: 0, width: 0, height: 0 },
 
      musicRow: { x: 0, y: 0, width: 0, height: 0 },
      musicDecreaseButton: { x: 0, y: 0, width: 0, height: 0 },
@@ -319,7 +319,7 @@ export let resizeHandlerBound = false;
 
 export let starSpawnTimer = 0;
 export let starSpawnCount = 0;
-export let boostBanePickupSpawnTimer = 0;
+export let boostblightPickupSpawnTimer = 0;
 
 // ==================================================
 // BASIC SETTERS
@@ -350,8 +350,8 @@ export function addStarSpawnCount(value = 1) {
      starSpawnCount = Math.max(0, starSpawnCount + value);
 }
 
-export function setBoostBanePickupSpawnTimer(value) {
-     boostBanePickupSpawnTimer = value;
+export function setBoostblightPickupSpawnTimer(value) {
+     boostblightPickupSpawnTimer = value;
 }
 
 export function setHoverCanvasPosition(x, y) {
@@ -411,30 +411,30 @@ export function addPlayerHealth(value) {
 // EFFECT SETTERS + HELPERS
 // ==================================================
 
-export function setBoostBaneTimer(boostBaneName, value) {
-     if (!(boostBaneName in boostBaneTimers)) {
+export function setBoostblightTimer(boostblightName, value) {
+     if (!(boostblightName in boostblightTimers)) {
           return;
      }
 
-     boostBaneTimers[boostBaneName] = Math.max(0, value);
+     boostblightTimers[boostblightName] = Math.max(0, value);
 }
 
-export function addBoostBaneTimer(boostBaneName, value) {
-     if (!(boostBaneName in boostBaneTimers)) {
+export function addBoostblightTimer(boostblightName, value) {
+     if (!(boostblightName in boostblightTimers)) {
           return;
      }
 
-     boostBaneTimers[boostBaneName] = Math.max(0, boostBaneTimers[boostBaneName] + value);
+     boostblightTimers[boostblightName] = Math.max(0, boostblightTimers[boostblightName] + value);
 }
 
-export function isBoostBaneActive(boostBaneName) {
-     return (boostBaneTimers[boostBaneName] || 0) > 0;
+export function isBoostblightActive(boostblightName) {
+     return (boostblightTimers[boostblightName] || 0) > 0;
 }
 
-export function decrementBoostBaneTimers() {
-     Object.keys(boostBaneTimers).forEach((boostBaneName) => {
-          if (boostBaneTimers[boostBaneName] > 0) {
-               boostBaneTimers[boostBaneName] -= 1;
+export function decrementBoostblightTimers() {
+     Object.keys(boostblightTimers).forEach((boostblightName) => {
+          if (boostblightTimers[boostblightName] > 0) {
+               boostblightTimers[boostblightName] -= 1;
           }
      });
 
@@ -457,9 +457,9 @@ export function clearActiveStatusUi() {
      activeStatusUi.duration = 0;
 }
 
-export function resetBoostBaneState() {
-     Object.keys(boostBaneTimers).forEach((boostBaneName) => {
-          boostBaneTimers[boostBaneName] = 0;
+export function resetBoostblightState() {
+     Object.keys(boostblightTimers).forEach((boostblightName) => {
+          boostblightTimers[boostblightName] = 0;
      });
 
      clearActiveStatusUi();
@@ -482,20 +482,20 @@ function syncSoundEffectsEnabledFromLevel() {
      soundEffectsEnabled = soundEffectsLevel > 0;
 }
 
-function syncBaneEnabledFromLevel() {
-     baneEnabled = baneLevel > 0;
+function syncblightEnabledFromLevel() {
+     blightEnabled = blightLevel > 0;
 }
 
 export function syncOptionFlagsFromLevels() {
      syncMusicEnabledFromLevel();
      syncSoundEffectsEnabledFromLevel();
-     syncBaneEnabledFromLevel();
+     syncblightEnabledFromLevel();
 }
 
 export function resetOptionsToDefaults() {
      musicLevel = defaultOptionLevelIndex;
      soundEffectsLevel = defaultOptionLevelIndex;
-     baneLevel = defaultOptionLevelIndex;
+     blightLevel = defaultOptionLevelIndex;
      movementLevel = 0;
      colorLevel = 0;
 
@@ -667,9 +667,9 @@ export function setSoundEffectsEnabled(value) {
      soundEffectsLevel = value ? maxOptionLevelIndex : 0;
 }
 
-export function setBaneEnabled(value) {
-     baneEnabled = value;
-     baneLevel = value ? maxOptionLevelIndex : 0;
+export function setblightEnabled(value) {
+     blightEnabled = value;
+     blightLevel = value ? maxOptionLevelIndex : 0;
 }
 
 // Level setters for Options UI.
@@ -683,9 +683,9 @@ export function setSoundEffectsLevel(value) {
      syncSoundEffectsEnabledFromLevel();
 }
 
-export function setBaneLevel(value) {
-     baneLevel = clampRuntimeOptionLevelIndex(value);
-     syncBaneEnabledFromLevel();
+export function setblightLevel(value) {
+     blightLevel = clampRuntimeOptionLevelIndex(value);
+     syncblightEnabledFromLevel();
 }
 
 export function setMovementLevel(value) {
@@ -867,11 +867,11 @@ export function resetGameState() {
 
      starSpawnTimer = 0;
      starSpawnCount = 0;
-     boostBanePickupSpawnTimer = 0;
+     boostblightPickupSpawnTimer = 0;
 
      stars.length = 0;
      strikes.length = 0;
-     boostBanePickups.length = 0;
+     boostblightPickups.length = 0;
      collisionBursts.length = 0;
 
      welcomeSelectionIndex = 0;
@@ -882,7 +882,7 @@ export function resetGameState() {
      resetGameMenuScroll();
      menuKeyboardFocus.timer = 0;
 
-     resetBoostBaneState();
+     resetBoostblightState();
      resetUiActionBounds();
 
      touchControls.touchMoveTarget.x = 0;

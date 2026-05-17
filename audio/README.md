@@ -6,7 +6,7 @@ Drop audio files in this folder using these filenames:
 - `star.wav`
 - `strike.wav`
 - `boost-effect.wav`
-- `bane-effect.wav`
+- `blight-effect.wav`
 - `win.wav`
 - `lose.wav`
 - `pause.wav`

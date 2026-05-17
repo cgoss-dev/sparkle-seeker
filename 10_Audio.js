@@ -20,7 +20,7 @@ export const starShowerAudioFiles = {
           star: "./audio/star.wav",
           strike: "./audio/strike.wav",
           boost: "./audio/boost-effect.wav",
-          bane: "./audio/bane-effect.wav",
+          blight: "./audio/blight-effect.wav",
           win: "./audio/win.wav",
           lose: "./audio/lose.wav",
           pause: "./audio/pause.wav",

@@ -1,11 +1,11 @@
 // NOTE: 8_Entities
-// Player behavior, stars, boost/bane pickups, collision bursts, and boost/bane state for Star Shower.
+// Player behavior, stars, boost/blight pickups, collision bursts, and boost/blight state for Star Shower.
 //
 // Owned here:
 // - player reset / clamping / movement / face-state sync / trail-state updates
 // - star spawning / updates / collection
-// - boost and bane pickup definitions
-// - active boost/bane timers and status sync
+// - boost and blight pickup definitions
+// - active boost/blight timers and status sync
 // - collision burst creation / updates
 // - shared falling-object color cycle
 //
@@ -33,25 +33,25 @@ import {
      scoreMultiplier,
      stars,
      strikes,
-     boostBanePickups,
+     boostblightPickups,
      collisionBursts,
      starSpawnTimer,
      starSpawnCount,
-     boostBanePickupSpawnTimer,
-     baneLevel,
+     boostblightPickupSpawnTimer,
+     blightLevel,
      movementLevel,
      colorLevel,
-     boostBaneTimers,
+     boostblightTimers,
      setStarSpawnTimer,
      addStarSpawnCount,
-     setBoostBanePickupSpawnTimer,
+     setBoostblightPickupSpawnTimer,
      addStarScore,
      setScoreMultiplier,
      addPlayerHealth,
      setPlayerHealth,
-     setBoostBaneTimer,
-     isBoostBaneActive,
-     decrementBoostBaneTimers,
+     setBoostblightTimer,
+     isBoostblightActive,
+     decrementBoostblightTimers,
      setActiveStatusUi,
      clearActiveStatusUi,
      randomItem,
@@ -77,11 +77,11 @@ import {
      progressUnitsPerCircle,
      getCurrentLevelNumber,
      getUnlockedBoostNamesForCurrentLevel,
-     getUnlockedBaneNamesForCurrentLevel
+     getUnlockedblightNamesForCurrentLevel
 } from "./5_GameRules.js";
 
 import {
-     starShowerBoostBaneIcons,
+     starShowerBoostblightIcons,
      starShowerRainbowPalette,
      getCssColor
 } from "./9_Config.js";
@@ -100,7 +100,7 @@ export const playerFaces = {
      neutral: "😐",
      smile: "🙂",
      star: "😁",
-     bane: "😫",
+     blight: "😫",
      maxHealth: "🤩",
      lowHealth: "😰",
      dead: "☠️",
@@ -124,7 +124,7 @@ export const starSpawnDelay = 25;
 export const starSpawnCap = 50;
 export const strikeSpawnRatio = 0.35;
 export const openingStrikeGraceStarSpawns = 3;
-export const boostBanePickupCap = 60;
+export const boostblightPickupCap = 60;
 export const collisionBurstParticleCount = 15;
 export const fallingObjectSpeedMin = 0.25;
 export const fallingObjectSpeedMax = 0.75;
@@ -136,7 +136,7 @@ const fallSpeedMinScale = 0.7;
 const fallSpeedMaxScale = 1;
 const fallingObjectSpeedStep = 0.25;
 
-export const boostBaneBaseSpawnStarsByLevel = [
+export const boostblightBaseSpawnStarsByLevel = [
      8,
      10,
      9,
@@ -149,7 +149,7 @@ export const boostBaneBaseSpawnStarsByLevel = [
      2
 ];
 
-export const boostBaneDifficultyMultipliers = [
+export const boostblightDifficultyMultipliers = [
      0,
      0.25,
      1,
@@ -157,29 +157,29 @@ export const boostBaneDifficultyMultipliers = [
      4
 ];
 
-const boostBaneTypes = Object.values(starShowerBoostBaneIcons);
+const boostblightTypes = Object.values(starShowerBoostblightIcons);
 const pickupAssetImages = {};
-const introducedBoostBaneNames = new Set();
-let boostBaneIntroCallback = null;
+const introducedBoostblightNames = new Set();
+let boostblightIntroCallback = null;
 
-export const boostTypes = boostBaneTypes.filter((type) => type.category === "boost");
-export const baneTypes = boostBaneTypes.filter((type) => type.category === "bane");
+export const boostTypes = boostblightTypes.filter((type) => type.category === "boost");
+export const blightTypes = boostblightTypes.filter((type) => type.category === "blight");
 
-export function setBoostBaneIntroCallback(callback) {
-     boostBaneIntroCallback = typeof callback === "function" ? callback : null;
+export function setBoostblightIntroCallback(callback) {
+     boostblightIntroCallback = typeof callback === "function" ? callback : null;
 }
 
-export function resetBoostBaneIntroState() {
-     introducedBoostBaneNames.clear();
+export function resetBoostblightIntroState() {
+     introducedBoostblightNames.clear();
 }
 
-function announceNewBoostBaneEntity(type) {
-     if (!type?.name || !boostBaneIntroCallback || introducedBoostBaneNames.has(type.name)) {
+function announceNewBoostblightEntity(type) {
+     if (!type?.name || !boostblightIntroCallback || introducedBoostblightNames.has(type.name)) {
           return;
      }
 
-     introducedBoostBaneNames.add(type.name);
-     boostBaneIntroCallback(type);
+     introducedBoostblightNames.add(type.name);
+     boostblightIntroCallback(type);
 }
 
 function getPickupAssetImage(src) {
@@ -240,8 +240,8 @@ function getScaledStrikeSpawnCap() {
      return Math.max(1, Math.round(getScaledStarSpawnCap() * strikeSpawnRatio));
 }
 
-function getScaledBoostBanePickupCap() {
-     return Math.max(1, Math.round(boostBanePickupCap * getSpawnDensityScale()));
+function getScaledBoostblightPickupCap() {
+     return Math.max(1, Math.round(boostblightPickupCap * getSpawnDensityScale()));
 }
 
 function getFallingObjectSpeed() {
@@ -255,28 +255,28 @@ function getFallingObjectSpeed() {
      return randomNumber(speedMin, speedMax);
 }
 
-function getBoostBaneSpawnChance() {
+function getBoostblightSpawnChance() {
      const levelIndex = Math.max(0, getCurrentLevelNumber() - 1);
-     const starsPerBoostBane = boostBaneBaseSpawnStarsByLevel[levelIndex] ?? boostBaneBaseSpawnStarsByLevel.at(-1);
-     const difficultyMultiplier = boostBaneDifficultyMultipliers[baneLevel] ?? 0;
+     const starsPerBoostblight = boostblightBaseSpawnStarsByLevel[levelIndex] ?? boostblightBaseSpawnStarsByLevel.at(-1);
+     const difficultyMultiplier = boostblightDifficultyMultipliers[blightLevel] ?? 0;
 
-     if (!Number.isFinite(starsPerBoostBane) || starsPerBoostBane <= 0 || difficultyMultiplier <= 0) {
+     if (!Number.isFinite(starsPerBoostblight) || starsPerBoostblight <= 0 || difficultyMultiplier <= 0) {
           return 0;
      }
 
-     return difficultyMultiplier / starsPerBoostBane;
+     return difficultyMultiplier / starsPerBoostblight;
 }
 
-function getBoostBaneSpawnInterval() {
+function getBoostblightSpawnInterval() {
      const levelIndex = Math.max(0, getCurrentLevelNumber() - 1);
-     const starsPerBoostBane = boostBaneBaseSpawnStarsByLevel[levelIndex] ?? boostBaneBaseSpawnStarsByLevel.at(-1);
-     const difficultyMultiplier = boostBaneDifficultyMultipliers[baneLevel] ?? 0;
+     const starsPerBoostblight = boostblightBaseSpawnStarsByLevel[levelIndex] ?? boostblightBaseSpawnStarsByLevel.at(-1);
+     const difficultyMultiplier = boostblightDifficultyMultipliers[blightLevel] ?? 0;
 
-     if (!Number.isFinite(starsPerBoostBane) || starsPerBoostBane <= 0 || difficultyMultiplier <= 0) {
+     if (!Number.isFinite(starsPerBoostblight) || starsPerBoostblight <= 0 || difficultyMultiplier <= 0) {
           return Infinity;
      }
 
-     return Math.max(2, Math.round(starsPerBoostBane / difficultyMultiplier));
+     return Math.max(2, Math.round(starsPerBoostblight / difficultyMultiplier));
 }
 
 // ====================================================================================================
@@ -401,7 +401,7 @@ export function getModeParticleColor(colorRole, fallback = "#ffffff", colorIndex
                return getCssColor("--color-gray2", "#666");
           }
 
-          if (colorRole === "strike" || colorRole === "bane") {
+          if (colorRole === "strike" || colorRole === "blight") {
                return getCssColor("--color-black", "#000");
           }
 
@@ -438,7 +438,7 @@ export function resetEntityColorCycle() {
 // ==================================================
 
 function getPlayerMovementMultiplier() {
-     if (isBoostBaneActive("freeze")) {
+     if (isBoostblightActive("freeze")) {
           return 0;
      }
 
@@ -491,11 +491,11 @@ export function getDefaultPlayerFace() {
           return playerFaces.dead;
      }
 
-     if (isBoostBaneActive("freeze")) {
+     if (isBoostblightActive("freeze")) {
           return playerFaces.frozen;
      }
 
-     if (isBoostBaneActive("daze")) {
+     if (isBoostblightActive("daze")) {
           return playerFaces.dazed;
      }
 
@@ -529,8 +529,8 @@ export function applyTemporaryPlayerFace(face, duration) {
           playerHealth <= 0 ||
           playerHealth === maxPlayerHealth ||
           playerHealth <= 2 ||
-          isBoostBaneActive("freeze") ||
-          isBoostBaneActive("daze")
+          isBoostblightActive("freeze") ||
+          isBoostblightActive("daze")
      ) {
           player.starFaceTimer = 0;
           refreshPlayerFaceFromHealth();
@@ -601,7 +601,7 @@ function movePlayerTowardPointerTarget() {
           return true;
      }
 
-     const reverseMultiplier = isBoostBaneActive("daze") ? -1 : 1;
+     const reverseMultiplier = isBoostblightActive("daze") ? -1 : 1;
      const step = Math.min(player.speed * getPlayerMovementMultiplier(), distance);
 
      player.x += (dx / distance) * step * reverseMultiplier;
@@ -639,7 +639,7 @@ function movePlayerFromKeyboard() {
      }
 
      const length = Math.hypot(dx, dy);
-     const reverseMultiplier = isBoostBaneActive("daze") ? -1 : 1;
+     const reverseMultiplier = isBoostblightActive("daze") ? -1 : 1;
      const speed = player.speed * getPlayerMovementMultiplier();
 
      player.x += (dx / length) * speed * reverseMultiplier;
@@ -669,7 +669,7 @@ function movePlayerFromJoystick() {
           return true;
      }
 
-     const reverseMultiplier = isBoostBaneActive("daze") ? -1 : 1;
+     const reverseMultiplier = isBoostblightActive("daze") ? -1 : 1;
      const speed = player.speed * getPlayerMovementMultiplier();
 
      player.x += joystick.dx * speed * reverseMultiplier;
@@ -746,7 +746,7 @@ export function updatePlayerTrail() {
 // EFFECT HELPERS
 // ==================================================
 
-const timedBoostBaneNames = [
+const timedBoostblightNames = [
      "magnet",
      "double",
      "freeze",
@@ -758,35 +758,35 @@ export function secondsToFrames(seconds) {
      return Math.round(seconds * framesPerSecond);
 }
 
-function getBoostBaneDurationFrames(boostBaneType) {
-     return secondsToFrames(boostBaneType.durationSeconds || 0);
+function getBoostblightDurationFrames(boostblightType) {
+     return secondsToFrames(boostblightType.durationSeconds || 0);
 }
 
 function getStatusFlashFrames() {
      return secondsToFrames(statusFlashSeconds);
 }
 
-function clearTimedBoostBanes() {
-     timedBoostBaneNames.forEach((boostBaneName) => {
-          setBoostBaneTimer(boostBaneName, 0);
+function clearTimedBoostblights() {
+     timedBoostblightNames.forEach((boostblightName) => {
+          setBoostblightTimer(boostblightName, 0);
      });
 }
 
-function syncScoreMultiplierFromBoostBanes() {
-     const nextMultiplier = isBoostBaneActive("double") ? 2 : 1;
+function syncScoreMultiplierFromBoostblights() {
+     const nextMultiplier = isBoostblightActive("double") ? 2 : 1;
 
      if (scoreMultiplier !== nextMultiplier) {
           setScoreMultiplier(nextMultiplier);
      }
 }
 
-function setSingleTimedBoostBane(boostBaneName, durationFrames) {
-     clearTimedBoostBanes();
-     setBoostBaneTimer(boostBaneName, durationFrames);
-     syncScoreMultiplierFromBoostBanes();
+function setSingleTimedBoostblight(boostblightName, durationFrames) {
+     clearTimedBoostblights();
+     setBoostblightTimer(boostblightName, durationFrames);
+     syncScoreMultiplierFromBoostblights();
 }
 
-function getHighestPriorityActiveBoostBane() {
+function getHighestPriorityActiveBoostblight() {
      const statusPriority = [
           "freeze",
           "fog",
@@ -796,33 +796,33 @@ function getHighestPriorityActiveBoostBane() {
      ];
 
      for (let i = 0; i < statusPriority.length; i += 1) {
-          const boostBaneName = statusPriority[i];
+          const boostblightName = statusPriority[i];
 
-          if (isBoostBaneActive(boostBaneName)) {
-               return boostBaneName;
+          if (isBoostblightActive(boostblightName)) {
+               return boostblightName;
           }
      }
 
      return "";
 }
 
-function getBoostBaneTypeByName(boostBaneName) {
+function getBoostblightTypeByName(boostblightName) {
      return (
-          boostTypes.find((type) => type.name === boostBaneName) ||
-          baneTypes.find((type) => type.name === boostBaneName) ||
+          boostTypes.find((type) => type.name === boostblightName) ||
+          blightTypes.find((type) => type.name === boostblightName) ||
           null
      );
 }
 
-function syncActiveStatusUiFromBoostBanes() {
-     const activeBoostBaneName = getHighestPriorityActiveBoostBane();
+function syncActiveStatusUiFromBoostblights() {
+     const activeBoostblightName = getHighestPriorityActiveBoostblight();
 
-     if (!activeBoostBaneName) {
+     if (!activeBoostblightName) {
           clearActiveStatusUi();
           return;
      }
 
-     const type = getBoostBaneTypeByName(activeBoostBaneName);
+     const type = getBoostblightTypeByName(activeBoostblightName);
 
      if (!type) {
           clearActiveStatusUi();
@@ -837,15 +837,15 @@ function syncActiveStatusUiFromBoostBanes() {
      setActiveStatusUi(
           type.label,
           type.particle,
-          boostBaneTimers[type.name] || 0,
-          getBoostBaneDurationFrames(type)
+          boostblightTimers[type.name] || 0,
+          getBoostblightDurationFrames(type)
      );
 }
 
-export function updateBoostBaneState() {
-     decrementBoostBaneTimers();
-     syncScoreMultiplierFromBoostBanes();
-     syncActiveStatusUiFromBoostBanes();
+export function updateBoostblightState() {
+     decrementBoostblightTimers();
+     syncScoreMultiplierFromBoostblights();
+     syncActiveStatusUiFromBoostblights();
 }
 
 function applyBoostPickup(type) {
@@ -855,13 +855,13 @@ function applyBoostPickup(type) {
           return;
      }
 
-     setSingleTimedBoostBane(type.name, getBoostBaneDurationFrames(type));
-     syncActiveStatusUiFromBoostBanes();
+     setSingleTimedBoostblight(type.name, getBoostblightDurationFrames(type));
+     syncActiveStatusUiFromBoostblights();
 }
 
-function applyBanePickup(type) {
-     setSingleTimedBoostBane(type.name, getBoostBaneDurationFrames(type));
-     syncActiveStatusUiFromBoostBanes();
+function applyblightPickup(type) {
+     setSingleTimedBoostblight(type.name, getBoostblightDurationFrames(type));
+     syncActiveStatusUiFromBoostblights();
 }
 
 function getObjectFallSpeedMultiplier() {
@@ -877,7 +877,7 @@ export const strikeParticles = ["\u2716\uFE0E", "\u2715\uFE0E"];
 export const strikeAssetSrc = "./images/icons/strike.svg";
 
 function getStarCollisionRadiusMultiplier() {
-     if (!isBoostBaneActive("magnet")) {
+     if (!isBoostblightActive("magnet")) {
           return 1;
      }
 
@@ -964,7 +964,7 @@ export function updateStarSpawns() {
                createStar();
                addStarSpawnCount();
                createMatchingStrikeFromStarSpawn();
-               maybeCreateBoostBanePickupsFromStarSpawn();
+               maybeCreateBoostblightPickupsFromStarSpawn();
           }
 
           setStarSpawnTimer(0);
@@ -1029,12 +1029,12 @@ export function collectStrikes() {
                continue;
           }
 
-          createCollisionBurst(strike.x, strike.y, strike.color, "bane");
+          createCollisionBurst(strike.x, strike.y, strike.color, "blight");
           strikes.splice(i, 1);
 
           addPlayerHealth(-strikeHealthDamage);
           syncPlayerHealthState();
-          applyTemporaryPlayerFace(playerFaces.bane, 30);
+          applyTemporaryPlayerFace(playerFaces.blight, 30);
           triggerPlayerFacePop(1.25);
           playSoundEffect("strike");
      }
@@ -1044,10 +1044,10 @@ export function collectStrikes() {
 // EFFECT PICKUPS
 // ==================================================
 
-function createBoostBanePickup(type, category) {
+function createBoostblightPickup(type, category) {
      const x = Math.random() * (miniGameWidth - 20) + 10;
 
-     boostBanePickups.push({
+     boostblightPickups.push({
           x,
           baseX: x,
           y: -20,
@@ -1058,7 +1058,7 @@ function createBoostBanePickup(type, category) {
           particle: type.particle,
           type,
           category,
-          colorRole: category === "boost" ? "boost" : "bane",
+          colorRole: category === "boost" ? "boost" : "blight",
           colorIndex: getNextPastelColorIndex(),
           color: getNextParticleColor(),
           wobbleOffset: Math.random() * Math.PI * 2,
@@ -1066,97 +1066,97 @@ function createBoostBanePickup(type, category) {
           wobbleAmount: 5 + Math.random() * 10
      });
 
-     announceNewBoostBaneEntity(type);
+     announceNewBoostblightEntity(type);
 }
 
 export function createBoostPickup() {
      const unlockedBoostNames = getUnlockedBoostNamesForCurrentLevel();
-     const availableBoostBaneTypes = boostTypes.filter((type) => unlockedBoostNames.includes(type.name));
+     const availableBoostblightTypes = boostTypes.filter((type) => unlockedBoostNames.includes(type.name));
 
-     if (availableBoostBaneTypes.length <= 0) {
+     if (availableBoostblightTypes.length <= 0) {
           return false;
      }
 
-     createBoostBanePickup(randomItem(availableBoostBaneTypes), "boost");
+     createBoostblightPickup(randomItem(availableBoostblightTypes), "boost");
      return true;
 }
 
-export function createBanePickup() {
-     const unlockedBaneNames = getUnlockedBaneNamesForCurrentLevel();
-     const availableBoostBaneTypes = baneTypes.filter((type) => unlockedBaneNames.includes(type.name));
+export function createblightPickup() {
+     const unlockedblightNames = getUnlockedblightNamesForCurrentLevel();
+     const availableBoostblightTypes = blightTypes.filter((type) => unlockedblightNames.includes(type.name));
 
-     if (availableBoostBaneTypes.length <= 0) {
+     if (availableBoostblightTypes.length <= 0) {
           return false;
      }
 
-     createBoostBanePickup(randomItem(availableBoostBaneTypes), "bane");
+     createBoostblightPickup(randomItem(availableBoostblightTypes), "blight");
      return true;
 }
 
-function createRandomBoostBanePickup() {
-     if (Math.random() < 0.5 && createBanePickup()) {
+function createRandomBoostblightPickup() {
+     if (Math.random() < 0.5 && createblightPickup()) {
           return;
      }
 
      createBoostPickup();
 }
 
-export function maybeCreateBoostBanePickupsFromStarSpawn() {
-     const boostBaneSpawnChance = getBoostBaneSpawnChance();
-     const boostBaneSpawnInterval = getBoostBaneSpawnInterval();
-     const nextBoostBanePickupSpawnTimer = boostBanePickupSpawnTimer + 1;
+export function maybeCreateBoostblightPickupsFromStarSpawn() {
+     const boostblightSpawnChance = getBoostblightSpawnChance();
+     const boostblightSpawnInterval = getBoostblightSpawnInterval();
+     const nextBoostblightPickupSpawnTimer = boostblightPickupSpawnTimer + 1;
 
-     if (boostBanePickups.length >= getScaledBoostBanePickupCap()) {
+     if (boostblightPickups.length >= getScaledBoostblightPickupCap()) {
           return;
      }
 
-     if (!Number.isFinite(boostBaneSpawnInterval)) {
-          setBoostBanePickupSpawnTimer(0);
+     if (!Number.isFinite(boostblightSpawnInterval)) {
+          setBoostblightPickupSpawnTimer(0);
           return;
      }
 
-     setBoostBanePickupSpawnTimer(nextBoostBanePickupSpawnTimer);
+     setBoostblightPickupSpawnTimer(nextBoostblightPickupSpawnTimer);
 
-     if (nextBoostBanePickupSpawnTimer >= boostBaneSpawnInterval) {
-          createRandomBoostBanePickup();
-          setBoostBanePickupSpawnTimer(0);
+     if (nextBoostblightPickupSpawnTimer >= boostblightSpawnInterval) {
+          createRandomBoostblightPickup();
+          setBoostblightPickupSpawnTimer(0);
           return;
      }
 
-     if (boostBaneSpawnChance > 0 && Math.random() <= boostBaneSpawnChance) {
+     if (boostblightSpawnChance > 0 && Math.random() <= boostblightSpawnChance) {
           createBoostPickup();
-          setBoostBanePickupSpawnTimer(0);
+          setBoostblightPickupSpawnTimer(0);
      }
 
-     if (boostBanePickups.length >= getScaledBoostBanePickupCap()) {
+     if (boostblightPickups.length >= getScaledBoostblightPickupCap()) {
           return;
      }
 
-     if (boostBaneSpawnChance > 0 && Math.random() <= boostBaneSpawnChance) {
-          createBanePickup();
-          setBoostBanePickupSpawnTimer(0);
+     if (boostblightSpawnChance > 0 && Math.random() <= boostblightSpawnChance) {
+          createblightPickup();
+          setBoostblightPickupSpawnTimer(0);
      }
 }
 
-export function updateBoostBanePickups() {
+export function updateBoostblightPickups() {
      const fallSpeedMultiplier = getObjectFallSpeedMultiplier();
 
-     for (let i = boostBanePickups.length - 1; i >= 0; i -= 1) {
-          const pickup = boostBanePickups[i];
+     for (let i = boostblightPickups.length - 1; i >= 0; i -= 1) {
+          const pickup = boostblightPickups[i];
 
           pickup.y += pickup.speed * fallSpeedMultiplier;
           pickup.wobbleOffset += pickup.wobbleSpeed;
           pickup.x = pickup.baseX + Math.sin(pickup.wobbleOffset) * pickup.wobbleAmount;
 
           if (pickup.y > miniGameHeight + 30) {
-               boostBanePickups.splice(i, 1);
+               boostblightPickups.splice(i, 1);
           }
      }
 }
 
 function collectBoostPickup(pickup, index) {
      createCollisionBurst(pickup.x, pickup.y, pickup.color, "star", "boost");
-     boostBanePickups.splice(index, 1);
+     boostblightPickups.splice(index, 1);
 
      applyBoostPickup(pickup.type);
      applyTemporaryPlayerFace(playerFaces.star, 45);
@@ -1164,20 +1164,20 @@ function collectBoostPickup(pickup, index) {
      playSoundEffect("boost");
 }
 
-function collectBanePickup(pickup, index) {
-     createCollisionBurst(pickup.x, pickup.y, pickup.color, "bane", "bane");
-     boostBanePickups.splice(index, 1);
+function collectblightPickup(pickup, index) {
+     createCollisionBurst(pickup.x, pickup.y, pickup.color, "blight", "blight");
+     boostblightPickups.splice(index, 1);
 
-     applyBanePickup(pickup.type);
+     applyblightPickup(pickup.type);
      syncPlayerHealthState();
-     applyTemporaryPlayerFace(playerFaces.bane, 30);
+     applyTemporaryPlayerFace(playerFaces.blight, 30);
      triggerPlayerFacePop(1.25);
-     playSoundEffect("bane");
+     playSoundEffect("blight");
 }
 
-export function collectBoostBanePickups() {
-     for (let i = boostBanePickups.length - 1; i >= 0; i -= 1) {
-          const pickup = boostBanePickups[i];
+export function collectBoostblightPickups() {
+     for (let i = boostblightPickups.length - 1; i >= 0; i -= 1) {
+          const pickup = boostblightPickups[i];
 
           if (!isCollidingWithStar(player, pickup)) {
                continue;
@@ -1186,7 +1186,7 @@ export function collectBoostBanePickups() {
           if (pickup.category === "boost") {
                collectBoostPickup(pickup, i);
           } else {
-               collectBanePickup(pickup, i);
+               collectblightPickup(pickup, i);
           }
      }
 }
@@ -1200,7 +1200,7 @@ export const burstChars = ["✦", "✧", "·", "•"];
 export function createCollisionBurst(x, y, color, burstType, colorRole = null) {
      for (let i = 0; i < collisionBurstParticleCount; i += 1) {
           const angle = randomNumber(0, Math.PI * 2);
-          const speed = burstType === "bane"
+          const speed = burstType === "blight"
                ? randomNumber(1.1, 2.6)
                : randomNumber(0.7, 2.1);
 
@@ -1213,10 +1213,10 @@ export function createCollisionBurst(x, y, color, burstType, colorRole = null) {
                maxLife: 50,
                size: randomNumber(20, 30),
                particle: randomItem(burstChars),
-               colorRole: colorRole || (burstType === "bane" ? "strike" : "star"),
+               colorRole: colorRole || (burstType === "blight" ? "strike" : "star"),
                colorIndex: getNextPastelColorIndex(),
                color,
-               glowBoost: burstType === "bane" ? 1.25 : 1
+               glowBoost: burstType === "blight" ? 1.25 : 1
           });
      }
 }
@@ -1335,7 +1335,7 @@ export function drawStrikes() {
      }
 }
 
-export function drawBoostBanePickups() {
+export function drawBoostblightPickups() {
      if (!miniGameCtx) {
           return;
      }
@@ -1371,8 +1371,8 @@ export function drawBoostBanePickups() {
      miniGameCtx.textAlign = "center";
      miniGameCtx.textBaseline = "middle";
 
-     for (let i = boostBanePickups.length - 1; i >= 0; i -= 1) {
-          const pickup = boostBanePickups[i];
+     for (let i = boostblightPickups.length - 1; i >= 0; i -= 1) {
+          const pickup = boostblightPickups[i];
           const fillColor = getParticleFillColor(pickup);
 
           const pickupFontSize = Math.max(20, pickup.size);
