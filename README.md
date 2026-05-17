@@ -6,40 +6,6 @@ Star Shower is a standalone browser game. Collect falling stars, avoid damaging 
 
 This repo is intentionally separate from the main portfolio site so the game can be developed, versioned, and published on its own. The portfolio can link to the finished game without owning the game source.
 
-## Local Preview
-
-Install is not required for normal previewing. The project is plain HTML, CSS, and JavaScript modules.
-
-```sh
-npm run dev
-```
-
-Then visit:
-
-```text
-http://localhost:8000
-```
-
-You can also run the server directly:
-
-```sh
-python3 -m http.server 8000
-```
-
-## Useful Commands
-
-```sh
-npm run dev
-```
-
-Starts a local static server on port `8000`.
-
-```sh
-npm run check
-```
-
-Runs syntax checks for the JavaScript modules.
-
 ## Gameplay
 
 The player collects stars to gain points and speed. Strikes damage health. Boosts help the player, while blights create temporary hazards.
@@ -155,7 +121,7 @@ The project uses native JavaScript modules and has no build step. Keep imports r
 
 The current module boundaries are:
 
-- `game.js` answers: what happens next?
+- `-game.js` answers: what happens next?
 - `state.js` answers: what shared values exist right now?
 - `options.js` answers: what settings and reusable tunables exist?
 - `input.js` answers: how does the player/menu receive input?
