@@ -77,19 +77,13 @@ import {
      progressUnitsPerCircle,
      getCurrentLevelNumber,
      getUnlockedBoostNamesForCurrentLevel,
-     getUnlockedblightNamesForCurrentLevel
-} from "./5_GameRules.js";
-
-import {
+     getUnlockedblightNamesForCurrentLevel,
      starShowerBoostblightIcons,
      starShowerGuideIcons,
      starShowerRainbowPalette,
-     getCssColor
-} from "./9_Config.js";
-
-import {
+     getCssColor,
      playSoundEffect
-} from "./10_Audio.js";
+} from "./2_GameEngine.js";
 
 const siteTheme = window.SiteTheme;
 
@@ -159,15 +153,19 @@ export const boostblightDifficultyMultipliers = [
      4
 ];
 
-const boostblightTypes = Object.values(starShowerBoostblightIcons);
 const pickupAssetImages = {};
 const introducedBoostblightNames = new Set();
 let introducedStrike = false;
 let lastSpawnedBoostblightName = "";
 let boostblightIntroCallback = null;
 
-export const boostTypes = boostblightTypes.filter((type) => type.category === "boost");
-export const blightTypes = boostblightTypes.filter((type) => type.category === "blight");
+function getBoostTypes() {
+     return Object.values(starShowerBoostblightIcons).filter((type) => type.category === "boost");
+}
+
+function getblightTypes() {
+     return Object.values(starShowerBoostblightIcons).filter((type) => type.category === "blight");
+}
 
 export function setBoostblightIntroCallback(callback) {
      boostblightIntroCallback = typeof callback === "function" ? callback : null;
@@ -828,8 +826,8 @@ function getHighestPriorityActiveBoostblight() {
 
 function getBoostblightTypeByName(boostblightName) {
      return (
-          boostTypes.find((type) => type.name === boostblightName) ||
-          blightTypes.find((type) => type.name === boostblightName) ||
+          getBoostTypes().find((type) => type.name === boostblightName) ||
+          getblightTypes().find((type) => type.name === boostblightName) ||
           null
      );
 }
@@ -1118,7 +1116,7 @@ function createBoostblightPickupFromTypes(availableTypes, category) {
 
 export function createBoostPickup() {
      const unlockedBoostNames = getUnlockedBoostNamesForCurrentLevel();
-     const availableBoostblightTypes = boostTypes.filter((type) => unlockedBoostNames.includes(type.name));
+     const availableBoostblightTypes = getBoostTypes().filter((type) => unlockedBoostNames.includes(type.name));
 
      if (availableBoostblightTypes.length <= 0) {
           return false;
@@ -1130,7 +1128,7 @@ export function createBoostPickup() {
 
 export function createblightPickup() {
      const unlockedblightNames = getUnlockedblightNamesForCurrentLevel();
-     const availableBoostblightTypes = blightTypes.filter((type) => unlockedblightNames.includes(type.name));
+     const availableBoostblightTypes = getblightTypes().filter((type) => unlockedblightNames.includes(type.name));
 
      if (availableBoostblightTypes.length <= 0) {
           return false;

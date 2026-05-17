@@ -18,7 +18,7 @@
 //   and "what reusable numbers should the rest of the game agree on?"
 // - If code changes every frame, it belongs in `3_State.js` or gameplay files.
 // - If code draws pixels, it belongs in `7_Draw.js`.
-// - If code maps CSS into the canvas theme object, it belongs in `9_Config.js`.
+// - If code maps CSS into the canvas theme object, it belongs in `2_GameEngine.js`.
 
 import {
      miniGameCtx,
@@ -38,7 +38,7 @@ import {
 
 import {
      getCssBoolean
-} from "./9_Config.js";
+} from "./2_GameEngine.js";
 
 // ==================================================
 // STORAGE

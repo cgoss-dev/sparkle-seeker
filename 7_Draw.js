@@ -20,7 +20,7 @@
 // - This file should answer "what does the player see?"
 // - If code changes gameplay state or movement rules, it belongs in `8_Entities.js`.
 // - If code only stores mutable shared values, it belongs in `3_State.js`.
-// - If code maps CSS/theme values into a canvas theme object, it belongs in `9_Config.js`.
+// - If code maps CSS/theme values into a canvas theme object, it belongs in `2_GameEngine.js`.
 
 import {
      miniGameCtx,
@@ -90,11 +90,6 @@ import {
 } from "./4_Options.js";
 
 import {
-     getCanvasTheme,
-     getCssColor
-} from "./9_Config.js";
-
-import {
      drawStars,
      drawStrikes,
      drawBoostblightPickups,
@@ -117,6 +112,8 @@ import {
 } from "./8_Entities.js";
 
 import {
+     getCanvasTheme,
+     getCssColor,
      getCurrentLevelMeterUnits,
      maxLevelProgressUnits,
      progressUnitsPerCircle,
@@ -129,10 +126,7 @@ import {
      getDifficultyOptionLines,
      getAudioOptionLines,
      getMovementOptionLines,
-     getColorOptionLines
-} from "./5_GameRules.js";
-
-import {
+     getColorOptionLines,
      isScreenWelcomeActive,
      isOverlayScreenActive,
      getCurrentScreenTitleLines,

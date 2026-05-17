@@ -19,7 +19,7 @@
 // Newbie note:
 // - This file should answer "what happens when the player presses or taps?"
 // - If code stores flags/arrays, it belongs in `3_State.js`.
-// - If code draws buttons, it belongs in `9_Config.js`.
+// - If code draws buttons, it belongs in `7_Draw.js`.
 // - If code decides win/lose flow, it belongs in `2_GameEngine.js`.
 
 import {

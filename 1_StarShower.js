@@ -1,8 +1,19 @@
 // NOTE: STAR SHOWER PAGE HELPERS
 
-import {
-     starShowerRainbowPalette
-} from "./9_Config.js";
+const starShowerRainbowPalette = [
+     "#f00",
+     "#f80",
+     "#ff0",
+     "#bf0",
+     "#0f0",
+     "#0fb",
+     "#0ff",
+     "#0bf",
+     "#00f",
+     "#80f",
+     "#f0f",
+     "#f08"
+];
 
 function getCssValue(variableName) {
      return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
@@ -56,11 +67,11 @@ function getGlowSettings() {
 
 function getStarSettings() {
      return {
-          countMax: getCssNumber("--star-count-max", 180),
+          countMax: getCssNumber("--star-count-max", 100),
           sizeMin: getCssNumber("--star-size-min", 16),
           sizeMax: getCssNumber("--star-size-max", 26),
-          speedMin: getCssNumber("--star-speed-min", 0.2),
-          speedMax: getCssNumber("--star-speed-max", 0.7),
+          speedMin: getCssNumber("--star-speed-min", 0.25),
+          speedMax: getCssNumber("--star-speed-max", 0.75),
           density: getCssNumber("--star-density", 0.00015),
           wobbleSpeedMin: getCssNumber("--star-wobble-speed-min", 0.005),
           wobbleSpeedMax: getCssNumber("--star-wobble-speed-max", 0.02),
